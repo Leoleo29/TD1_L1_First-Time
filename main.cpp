@@ -1,4 +1,5 @@
 #include <Novice.h>
+#include <cstring>
 #include "game.h"
 
 const char kWindowTitle[] =
@@ -11,58 +12,74 @@ int WINAPI WinMain(
 	_In_ int
 )
 {
-	// Novice初期化
 	Novice::Initialize(
 		kWindowTitle,
-		kWindowWidth,
-		kWindowHeight
+		1920,
+		1080
 	);
 
-	// ブロック画像
-	int blockGraphHandle =
+	int blockTexture =
 		Novice::LoadTexture("./images/block.png");
 
-	// ゲームで使用するデータ
-	Player player{};
-	Camera camera{};
+	int playerTexture =
+		Novice::LoadTexture("./images/player.png");
 
-	InitializeGame(player, camera);
+	int bar1Texture =
+		Novice::LoadTexture("./images/bar1.png");
 
-	// キー入力
+	int bar2Texture =
+		Novice::LoadTexture("./images/bar2.png");
+
+
+
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	// メインループ
+	Player player;
+	InitializePlayer(player);
+
+	Camera camera = { 0.0f, 0.0f };
+
+	InitializeMap();
+
 	while (Novice::ProcessMessage() == 0)
 	{
 		Novice::BeginFrame();
 
-		// キー入力
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
-		// ==============================
-		// 更新
-		// ==============================
-		UpdateGame(
+		UpdatePlayer(
 			player,
-			camera,
 			keys,
 			preKeys
 		);
 
-		// ==============================
-		// 描画
-		// ==============================
-		DrawGame(
+		UpdateCamera(
+			camera,
+			player
+		);
+
+
+		DrawMap(
+			blockTexture,
+			camera
+		);
+
+		DrawPlayer(
 			player,
 			camera,
-			blockGraphHandle
+			playerTexture
+		);
+
+		DrawBackground(
+			player,
+			bar1Texture,
+			bar2Texture
 		);
 
 		Novice::EndFrame();
 
-		// ESCで終了
 		if (
 			preKeys[DIK_ESCAPE] == 0 &&
 			keys[DIK_ESCAPE] != 0

@@ -2,10 +2,16 @@
 
 void InitializePlayer(Player& player)
 {
-	// 上のコードを基準に初期位置を設定
-	player.position = { 400.0f, 400.0f };
-	player.velocity = { 0.0f, 0.0f };
-	player.direction = kDown;
+	player.x = 120.0f;
+	player.y = 3080.0f;
+
+	// 最初は右
+	player.direction = 2;
+
+	// 最初は止まっている
+	player.isMoving = false;
+
+	player.speed = 10.0f;
 }
 
 void UpdatePlayer(
@@ -14,148 +20,95 @@ void UpdatePlayer(
 	char* preKeys
 )
 {
-	// SPACEを押した瞬間に方向を切り替える
-	if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
+	// SPACEを押した瞬間
+	if (
+		preKeys[DIK_SPACE] == 0 &&
+		keys[DIK_SPACE] != 0
+		)
 	{
-		switch (player.direction)
+		// 反時計回りに90度
+		player.direction--;
+
+		if (player.direction < 0)
 		{
-		case kDown:
-			player.direction = kRight;
-			break;
-
-		case kRight:
-			player.direction = kUp;
-			break;
-
-		case kUp:
-			player.direction = kLeft;
-			break;
-
-		case kLeft:
-			player.direction = kDown;
-			break;
+			player.direction = 3;
 		}
 
-		// 向きを変えたら速度をリセット
-		player.velocity = { 0.0f, 0.0f };
+		player.isMoving = true;
 	}
 
-	// 引っ張られる力
-	const float acceleration = 0.2f;
-
-	// 最大速度
-	const float maxSpeed = 5.0f;
-
-	// 現在の方向に加速
-	switch (player.direction)
+	if (!player.isMoving)
 	{
-	case kUp:
-		player.velocity.y -= acceleration;
-
-		if (player.velocity.y < -maxSpeed)
-		{
-			player.velocity.y = -maxSpeed;
-		}
-		break;
-
-	case kDown:
-		player.velocity.y += acceleration;
-
-		if (player.velocity.y > maxSpeed)
-		{
-			player.velocity.y = maxSpeed;
-		}
-		break;
-
-	case kRight:
-		player.velocity.x += acceleration;
-
-		if (player.velocity.x > maxSpeed)
-		{
-			player.velocity.x = maxSpeed;
-		}
-		break;
-
-	case kLeft:
-		player.velocity.x -= acceleration;
-
-		if (player.velocity.x < -maxSpeed)
-		{
-			player.velocity.x = -maxSpeed;
-		}
-		break;
+		return;
 	}
 
-	// 次の位置
-	float nextX = player.position.x + player.velocity.x;
-	float nextY = player.position.y + player.velocity.y;
+	float nextX = player.x;
+	float nextY = player.y;
 
-	// プレイヤーが入る予定のマス
-	int currentMapX =
-		static_cast<int>(player.position.x) / kMapSize;
-
-	int currentMapY =
-		static_cast<int>(player.position.y) / kMapSize;
-
-	int nextMapX =
-		static_cast<int>(nextX) / kMapSize;
-
-	int nextMapY =
-		static_cast<int>(nextY) / kMapSize;
-
-	// 別のマスへ入る場合だけ壁をチェック
-	if (currentMapX != nextMapX || currentMapY != nextMapY)
+	if (player.direction == 0)
 	{
-		if (
-			nextMapX < 0 ||
-			nextMapX >= kMaxWidth ||
-			nextMapY < 0 ||
-			nextMapY >= kMaxHeight ||
-			mapData[nextMapY][nextMapX] == 1
-			)
+		nextY -= player.speed;
+	}
+	else if (player.direction == 1)
+	{
+		nextX += player.speed;
+	}
+	else if (player.direction == 2)
+	{
+		nextY += player.speed;
+	}
+	else if (player.direction == 3)
+	{
+		nextX -= player.speed;
+	}
+
+	const float halfSize = 40.0f;
+
+	float left = nextX - halfSize;
+	float right = nextX + halfSize;
+	float top = nextY - halfSize;
+	float bottom = nextY + halfSize;
+
+	int leftMapX =
+		static_cast<int>(left) / kMapSize;
+
+	int rightMapX =
+		static_cast<int>(right - 1.0f) / kMapSize;
+
+	int topMapY =
+		static_cast<int>(top) / kMapSize;
+
+	int bottomMapY =
+		static_cast<int>(bottom - 1.0f) / kMapSize;
+
+	bool hitWall = false;
+
+	for (int y = topMapY; y <= bottomMapY; y++)
+	{
+		for (int x = leftMapX; x <= rightMapX; x++)
 		{
-			// 壁にぶつかったらその方向の速度を止める
-			if (player.direction == kUp || player.direction == kDown)
+			if (
+				x < 0 ||
+				x >= kMaxWidth ||
+				y < 0 ||
+				y >= kMaxHeight
+				)
 			{
-				player.velocity.y = 0.0f;
-			} else
-			{
-				player.velocity.x = 0.0f;
+				hitWall = true;
 			}
-
-			return;
+			else if (mapData[y][x] == 1)
+			{
+				hitWall = true;
+			}
 		}
 	}
 
-	// ワールドの端
-	const float minPosition = 40.0f;
-	const float maxPositionX = kMaxWidth * kMapSize - 40.0f;
-	const float maxPositionY = kMaxHeight * kMapSize - 40.0f;
-
-	if (nextX < minPosition)
+	if (hitWall)
 	{
-		nextX = minPosition;
-		player.velocity.x = 0.0f;
+		player.isMoving = false;
+		return;
 	}
 
-	if (nextX > maxPositionX)
-	{
-		nextX = maxPositionX;
-		player.velocity.x = 0.0f;
-	}
-
-	if (nextY < minPosition)
-	{
-		nextY = minPosition;
-		player.velocity.y = 0.0f;
-	}
-
-	if (nextY > maxPositionY)
-	{
-		nextY = maxPositionY;
-		player.velocity.y = 0.0f;
-	}
-
-	player.position.x = nextX;
-	player.position.y = nextY;
+	player.x = nextX;
+	player.y = nextY;
 }
