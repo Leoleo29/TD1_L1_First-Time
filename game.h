@@ -1,16 +1,27 @@
 #pragma once
 #include <Novice.h>
 
-// 定義
+// 宣言
 
+// ウィンドウサイズ
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;
-
+// プレイ画面サイズ
 const int kGameWidth = 800;
 const int kGameHeight = 800;
+// プレイ画面の左上
+const int kGameX =
+(kWindowWidth - kGameWidth) / 2;
 
-const int kGameX = 560;
-const int kGameY = 140;
+const int kGameY =
+(kWindowHeight - kGameHeight) / 2;
+
+// プレイ画面の中央
+const float kGameCenterX =
+kGameWidth / 2.0f;
+
+const float kGameCenterY =
+kGameHeight / 2.0f;
 
 const int kMaxWidth = 40;
 const int kMaxHeight = 40;
@@ -67,3 +78,12 @@ void DrawPlayer(
 	const Camera& camera,
 	int playerTexture
 );
+
+// シーン処理
+enum Scene
+{
+	kSceneTitle,
+	kSceneGame,
+	kSceneClear,
+	kSceneGameOver
+};

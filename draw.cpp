@@ -1,37 +1,52 @@
 #include "game.h"
 
 // 描画処理
-// 宣言
+// 描画処理の定義
 
 void UpdateCamera(
 	Camera& camera,
 	const Player& player
 )
 {
-	camera.x = player.x - 400.0f;
-	camera.y = player.y - 400.0f;
+	camera.x =
+		player.x -
+		kGameWidth / 2.0f;
 
+	camera.y =
+		player.y -
+		kGameHeight / 2.0f;
+
+
+	// 左端
 	if (camera.x < 0.0f)
 	{
 		camera.x = 0.0f;
 	}
 
+	// 上端
 	if (camera.y < 0.0f)
 	{
 		camera.y = 0.0f;
 	}
 
+
+	// カメラが移動できる最大値
 	float maxCameraX =
-		kMaxWidth * kMapSize - 800.0f;
+		kMaxWidth * kMapSize -
+		kGameWidth;
 
 	float maxCameraY =
-		kMaxHeight * kMapSize - 800.0f;
+		kMaxHeight * kMapSize -
+		kGameHeight;
 
+
+	// 右端
 	if (camera.x > maxCameraX)
 	{
 		camera.x = maxCameraX;
 	}
 
+	// 下端
 	if (camera.y > maxCameraY)
 	{
 		camera.y = maxCameraY;
@@ -158,14 +173,27 @@ void DrawMap(
 			if (mapData[i][j] == 1)
 			{
 				int posX =
-					560 +
+					kGameX +
 					j * kMapSize -
 					static_cast<int>(camera.x);
 
 				int posY =
-					140 +
+					kGameY +
 					i * kMapSize -
 					static_cast<int>(camera.y);
+
+
+				// プレイ画面外なら描画しない
+				if (
+					posX + kMapSize <= kGameX ||
+					posX >= kGameX + kGameWidth ||
+					posY + kMapSize <= kGameY ||
+					posY >= kGameY + kGameHeight
+					)
+				{
+					continue;
+				}
+
 
 				Novice::DrawSprite(
 					posX,
@@ -188,20 +216,21 @@ void DrawPlayer(
 )
 {
 	int drawX =
-		560 +
+		kGameX +
 		static_cast<int>(
 			player.x -
 			camera.x -
-			40.0f
+			kMapSize / 2.0f
 			);
 
 	int drawY =
-		140 +
+		kGameY +
 		static_cast<int>(
 			player.y -
 			camera.y -
-			40.0f
+			kMapSize / 2.0f
 			);
+
 
 	Novice::DrawSprite(
 		drawX,

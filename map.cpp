@@ -1,7 +1,7 @@
 #include "game.h"
 
 // マップチップのデータ
-// 宣言
+// マップ処理の定義
 
 int mapData[kMaxHeight][kMaxWidth] =
 {

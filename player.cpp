@@ -1,7 +1,7 @@
 #include "game.h"
 
-// プレイヤー処理
-// 宣言
+// プレイヤー
+//プレイヤー処理の定義
 
 void InitializePlayer(Player& player)
 {
