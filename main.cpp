@@ -1,6 +1,6 @@
 #include <Novice.h>
 #include <cstring>
-#include "game.h"
+#include "game.h"    // ゲームの定義をまとめたヘッダファイル
 
 const char kWindowTitle[] =
 "台パンするキンタロウ・ホズミ  ゼン";
@@ -18,18 +18,19 @@ int WINAPI WinMain(
 		1080
 	);
 
+	// 画像の読み込み
+	// 壁のデータ
 	int blockTexture =
 		Novice::LoadTexture("./images/block.png");
-
+	// プレイヤーのデータ
 	int playerTexture =
 		Novice::LoadTexture("./images/player.png");
-
+	// 進行方向　上下のデータ
 	int bar1Texture =
 		Novice::LoadTexture("./images/bar1.png");
-
+	// 進行方向　左右のデータ
 	int bar2Texture =
 		Novice::LoadTexture("./images/bar2.png");
-
 
 
 	char keys[256] = { 0 };
@@ -49,18 +50,20 @@ int WINAPI WinMain(
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
+
 		UpdatePlayer(
 			player,
 			keys,
 			preKeys
 		);
 
+
 		UpdateCamera(
 			camera,
 			player
 		);
 
-
+		// マップデータ
 		DrawMap(
 			blockTexture,
 			camera

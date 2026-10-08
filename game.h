@@ -1,6 +1,7 @@
 #pragma once
-
 #include <Novice.h>
+
+// 定義
 
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;

@@ -1,5 +1,8 @@
 #include "game.h"
 
+// プレイヤー処理
+// 宣言
+
 void InitializePlayer(Player& player)
 {
 	player.x = 120.0f;

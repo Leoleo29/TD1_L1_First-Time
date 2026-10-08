@@ -1,5 +1,8 @@
 #include "game.h"
 
+// 描画処理
+// 宣言
+
 void UpdateCamera(
 	Camera& camera,
 	const Player& player
@@ -210,3 +213,4 @@ void DrawPlayer(
 		WHITE
 	);
 }
+
