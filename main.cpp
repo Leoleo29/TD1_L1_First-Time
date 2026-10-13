@@ -50,6 +50,14 @@ int WINAPI WinMain(
 	// 進行方向　左右のデータ
 	int bar2Texture =
 		Novice::LoadTexture("./images/bar2.png");
+	int upBlock =
+		Novice::LoadTexture("./images/up.png");
+	int rightBlock =
+		Novice::LoadTexture("./images/right.png");
+	int downBlock =
+		Novice::LoadTexture("./images/down.png");
+	int leftBlock =
+		Novice::LoadTexture("./images/left.png");
 	// シーン画像
 	// タイトル
 	int SCENE_TitleTexture =
@@ -60,7 +68,6 @@ int WINAPI WinMain(
 	// ゲームオーバー
 	int SCENE_GameOverTexture =
 		Novice::LoadTexture("./images/SCENE_GameOver.png");
-
 
 
 	char keys[256] = { 0 };
@@ -137,9 +144,13 @@ int WINAPI WinMain(
 				player
 			);
 
-			// マップ描画
+
 			DrawMap(
 				blockTexture,
+				upBlock,
+				rightBlock,
+				downBlock,
+				leftBlock,
 				camera
 			);
 
