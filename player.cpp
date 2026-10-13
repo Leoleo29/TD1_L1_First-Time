@@ -8,7 +8,7 @@ void InitializePlayer(Player& player)
 	// 最初は右
 	player.direction = 2;
 
-	// 最初は止まっている
+	// 最初は止まってる
 	player.isMoving = false;
 
 	player.speed = 10.0f;
@@ -100,6 +100,26 @@ void UpdatePlayer(
 			{
 				hitWall = true;
 			}
+			else if (mapData[y][x] == kBlockUp) {
+				if (player.direction != 0) {
+					hitWall = true;
+				}
+			}
+			else if (mapData[y][x] == kBlockRight) {
+				if (player.direction != 1) {
+					hitWall = true;
+				}
+			}
+			else if (mapData[y][x] == kBlockDown) {
+				if (player.direction != 2) {
+					hitWall = true;
+				}
+			}
+			else if (mapData[y][x] == kBlockLeft) {
+				if (player.direction != 3) {
+					hitWall = true;
+				}
+			}
 		}
 	}
 
@@ -111,4 +131,7 @@ void UpdatePlayer(
 
 	player.x = nextX;
 	player.y = nextY;
+
+	
+
 }

@@ -145,6 +145,10 @@ void DrawBackground(
 
 void DrawMap(
 	int blockTexture,
+	int upBlock,
+	int rightBlock,
+	int downBlock,
+	int leftBlock,
 	const Camera& camera
 )
 {
@@ -168,6 +172,91 @@ void DrawMap(
 					posX,
 					posY,
 					blockTexture,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+
+			if (mapData[i][j] == kBlockUp) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					upBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData[i][j] == kBlockRight) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					rightBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData[i][j] == kBlockDown) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					downBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData[i][j] == kBlockLeft) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					leftBlock,
 					1.0f,
 					1.0f,
 					0.0f,

@@ -29,6 +29,15 @@ int WINAPI WinMain(
 
 	int bar2Texture =
 		Novice::LoadTexture("./images/bar2.png");
+	
+	int upBlock =
+		Novice::LoadTexture("./images/up.png");
+	int rightBlock =
+		Novice::LoadTexture("./images/right.png");
+	int downBlock =
+		Novice::LoadTexture("./images/down.png");
+	int leftBlock =
+		Novice::LoadTexture("./images/left.png");
 
 
 
@@ -63,6 +72,10 @@ int WINAPI WinMain(
 
 		DrawMap(
 			blockTexture,
+			upBlock,
+			rightBlock,
+			downBlock,
+			leftBlock,
 			camera
 		);
 

@@ -15,6 +15,11 @@ const int kMaxWidth = 40;
 const int kMaxHeight = 40;
 const int kMapSize = 80;
 
+const int kBlockUp = 2;
+const int kBlockRight = 3;
+const int kBlockDown = 4;
+const int kBlockLeft = 5;
+
 struct Player
 {
 	float x;
@@ -58,6 +63,10 @@ void DrawBackground(
 
 void DrawMap(
 	int blockTexture,
+	int upBlock,
+	int rightBlock,
+	int downBlock,
+	int leftBlock,
 	const Camera& camera
 );
 
