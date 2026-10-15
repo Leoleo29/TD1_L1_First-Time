@@ -1,6 +1,8 @@
 #include <Novice.h>
+#include <Windows.h>
 #include <cstring>
 #include "game.h"    // ゲームの宣言をまとめたヘッダファイル
+#include "fullScreen.h"
 
 const char kWindowTitle[] =
 "台パンするキンタロウ・ホズミ  ゼン";
@@ -12,11 +14,28 @@ int WINAPI WinMain(
 	_In_ int
 )
 {
-	Novice::Initialize(
-		kWindowTitle,
-		1920,
-		1080
-	);
+	// ウィンドウの初期化
+	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
+
+	
+	// Noviceのウィンドウハンドルを取得
+	HWND gameWindow = GetActiveWindow();
+
+	// ウィンドウの位置・サイズを保存する変数
+	RECT windowRect = {};
+
+	// ウィンドウのスタイルを保存
+	LONG_PTR windowStyle = 0;
+
+	// フルスクリーン状態
+	bool isFullScreen = false;
+
+	if (gameWindow == nullptr)
+	{
+		OutputDebugStringA(
+			"gameWindow is nullptr\n"
+		);
+	}
 
 	// 画像の読み込み
 	// 壁のデータ
@@ -62,6 +81,24 @@ int WINAPI WinMain(
 
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
+
+		// F11キーが押された瞬間に処理する
+		if (
+			keys[DIK_F11] != 0 &&
+			preKeys[DIK_F11] == 0
+			)
+		{
+			// F11が押されたか確認する
+			OutputDebugStringA("F11 pressed\n");
+
+			// フルスクリーンとウィンドウ表示を切り替える
+			ToggleFullScreen(
+				gameWindow,
+				windowRect,
+				windowStyle,
+				isFullScreen
+			);
+		}
 
 		switch (scene)
 		{
@@ -151,6 +188,18 @@ int WINAPI WinMain(
 			);
 			break;
 		}
+
+		Novice::ScreenPrintf(
+			10, 10,
+			"full screen : %d",
+			isFullScreen ? 1 : 0
+		);
+
+		Novice::ScreenPrintf(
+			10, 30,
+			"window handle : %d",
+			gameWindow != nullptr ? 1 : 0
+		);
 
 		Novice::EndFrame();
 

@@ -32,6 +32,9 @@
     <ClCompile Include="scene.cpp">
       <Filter>KamataEngine\Source</Filter>
     </ClCompile>
+    <ClCompile Include="fullScreen.cpp">
+      <Filter>KamataEngine\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -117,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="game.h">
       <Filter>KamataEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="fullScreen.h">
+      <Filter>KamataEngine\Source</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
