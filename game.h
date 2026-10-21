@@ -3,6 +3,15 @@
 
 // 宣言
 
+// シーン処理
+enum Scene
+{
+	kSceneTitle,
+	kSceneGame,
+	kSceneClear,
+	kSceneGameOver
+};
+
 // ウィンドウサイズ
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;
@@ -78,12 +87,3 @@ void DrawPlayer(
 	const Camera& camera,
 	int playerTexture
 );
-
-// シーン処理
-enum Scene
-{
-	kSceneTitle,
-	kSceneGame,
-	kSceneClear,
-	kSceneGameOver
-};

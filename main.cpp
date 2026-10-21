@@ -36,6 +36,14 @@ int WINAPI WinMain(
 			"gameWindow is nullptr\n"
 		);
 	}
+#pragma region // タイトル
+	// 矢印
+	/*int title_arrowTexture = 
+		Novice::title_arrowTexture("./images/UnderConstruction/title_arrow.png");*/
+
+
+
+#pragma endregion
 
 	// 画像の読み込み
 	// 壁のデータ
