@@ -36,6 +36,14 @@ int WINAPI WinMain(
 			"gameWindow is nullptr\n"
 		);
 	}
+#pragma region // タイトル
+	// 矢印
+	/*int title_arrowTexture = 
+		Novice::title_arrowTexture("./images/UnderConstruction/title_arrow.png");*/
+
+
+
+#pragma endregion
 
 	// 画像の読み込み
 	// 壁のデータ
@@ -124,12 +132,12 @@ int WINAPI WinMain(
 			// 〇〇が押されたらゲームスタート
 			if (preKeys[DIK_RETURN] == 0 && keys[DIK_RETURN] != 0)
 			{
-				scene = kSceneGame;
+				scene = kSceneTutorial;
 			}
 
 			break;
 
-		case kSceneGame:
+		case kSceneTutorial:
 
 			// プレイヤー更新
 			UpdatePlayer(
@@ -139,13 +147,50 @@ int WINAPI WinMain(
 			);
 
 			// カメラ更新
-			UpdateCamera(
+			UpdateTutorialCamera(
 				camera,
 				player
 			);
 
+			// マップ描画
+			DrawTutorialMap(
+				blockTexture,
+				camera
+			);
 
-			DrawMap(
+			// プレイヤー描画
+			DrawPlayer(
+				player,
+				camera,
+				playerTexture
+			);
+
+			// 背景描画
+			DrawBackground(
+				player,
+				bar1Texture,
+				bar2Texture
+			);
+
+			break;
+
+		case kSceneStage1:
+
+			// プレイヤー更新
+			UpdatePlayer(
+				player,
+				keys,
+				preKeys
+			);
+
+			// カメラ更新
+			UpdateStage1Camera(
+				camera,
+				player
+			);
+
+			// マップ描画
+			DrawStage1Map(
 				blockTexture,
 				upBlock,
 				rightBlock,

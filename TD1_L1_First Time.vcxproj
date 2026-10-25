@@ -172,7 +172,8 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="fullScreen.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="map.cpp" />
+    <ClCompile Include="map2.cpp" />
+    <ClCompile Include="map1.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="scene.cpp" />
   </ItemGroup>

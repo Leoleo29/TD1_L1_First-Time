@@ -3,6 +3,16 @@
 
 // 宣言
 
+// シーン処理
+enum Scene
+{
+	kSceneTitle,
+	kSceneTutorial,
+	kSceneStage1,
+	kSceneClear,
+	kSceneGameOver
+};
+
 // ウィンドウサイズ
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;
@@ -23,8 +33,12 @@ kGameWidth / 2.0f;
 const float kGameCenterY =
 kGameHeight / 2.0f;
 
-const int kMaxWidth = 40;
-const int kMaxHeight = 40;
+const int kMaxTutorialWidth = 20;
+const int kMaxTutorialHeight = 20;
+
+const int kMaxStage1Width = 40;
+const int kMaxStage1Height = 40;
+
 const int kMapSize = 80;
 
 const int kBlockUp = 2;
@@ -50,7 +64,9 @@ struct Camera
 	float y;
 };
 
-extern int mapData[kMaxHeight][kMaxWidth];
+extern int mapData1[kMaxTutorialWidth][kMaxTutorialHeight];
+
+extern int mapData2[kMaxStage1Width][kMaxStage1Height];
 
 void InitializePlayer(Player& player);
 
@@ -62,7 +78,12 @@ void UpdatePlayer(
 
 void InitializeMap();
 
-void UpdateCamera(
+void UpdateTutorialCamera(
+	Camera& camera,
+	const Player& player
+);
+
+void UpdateStage1Camera(
 	Camera& camera,
 	const Player& player
 );
@@ -73,7 +94,7 @@ void DrawBackground(
 	int bar2Texture
 );
 
-void DrawMap(
+void DrawTutorialMap(
 	int blockTexture,
 	int upBlock,
 	int rightBlock,
@@ -82,17 +103,14 @@ void DrawMap(
 	const Camera& camera
 );
 
+void DrawStage1Map(
+	int blockTexture,
+	const Camera& camera
+);
+
+
 void DrawPlayer(
 	const Player& player,
 	const Camera& camera,
 	int playerTexture
 );
-
-// シーン処理
-enum Scene
-{
-	kSceneTitle,
-	kSceneGame,
-	kSceneClear,
-	kSceneGameOver
-};
