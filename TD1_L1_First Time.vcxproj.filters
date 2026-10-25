@@ -20,7 +20,7 @@
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
       <Filter>KamataEngine\Adapter</Filter>
     </ClCompile>
-    <ClCompile Include="map.cpp">
+    <ClCompile Include="map2.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
     <ClCompile Include="draw.cpp">
@@ -34,6 +34,9 @@
     </ClCompile>
     <ClCompile Include="fullScreen.cpp">
       <Filter>KamataEngine\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="map1.cpp">
+      <Filter>KamataEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

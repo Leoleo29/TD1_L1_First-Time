@@ -92,14 +92,14 @@ void UpdatePlayer(
 		{
 			if (
 				x < 0 ||
-				x >= kMaxWidth ||
+				x >= kMaxTutorialWidth ||
 				y < 0 ||
-				y >= kMaxHeight
+				y >= kMaxTutorialHeight
 				)
 			{
 				hitWall = true;
 			}
-			else if (mapData[y][x] == 1)
+			else if (mapData1[y][x] == 1)
 			{
 				hitWall = true;
 			}
