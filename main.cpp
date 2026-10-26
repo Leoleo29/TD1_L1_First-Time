@@ -135,6 +135,18 @@ int WINAPI WinMain(
 				scene = kSceneTutorial;
 			}
 
+			// debug用 チュートリアル
+			if (preKeys[DIK_1] == 0 && keys[DIK_1] != 0)
+			{
+				scene = kSceneTutorial;
+			}
+
+			// debug用 チュートリアル
+			if (preKeys[DIK_2] == 0 && keys[DIK_2] != 0)
+			{
+				scene = kSceneStage1;
+			}
+
 			break;
 
 		case kSceneTutorial:
@@ -155,6 +167,10 @@ int WINAPI WinMain(
 			// マップ描画
 			DrawTutorialMap(
 				blockTexture,
+				upBlock,
+				rightBlock,
+				downBlock,
+				leftBlock,
 				camera
 			);
 
@@ -228,6 +244,12 @@ int WINAPI WinMain(
 				WHITE
 			);
 
+			// 〇〇が押されたらゲームスタート
+			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
+			{
+				scene = kSceneTitle;
+			}
+
 			break;
 
 		case kSceneGameOver:
@@ -242,7 +264,15 @@ int WINAPI WinMain(
 				0.0f,
 				WHITE
 			);
+
+			// 〇〇が押されたらゲームスタート
+			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
+			{
+				scene = kSceneTitle;
+			}
+
 			break;
+
 		}
 
 		Novice::ScreenPrintf(
@@ -256,6 +286,12 @@ int WINAPI WinMain(
 			"window handle : %d",
 			gameWindow != nullptr ? 1 : 0
 		);
+
+		/*Novice::ScreenPrintf(
+			10, 40,
+			"scene : %c",
+			Scene
+		);*/
 
 		Novice::EndFrame();
 

@@ -3,19 +3,20 @@
 // 描画処理
 // 描画処理の定義
 
+#pragma region // チュートリアル 関数定義
+
+// チュートリアルのプレイヤーのカメラ移動
 void UpdateTutorialCamera(
 	Camera& camera,
 	const Player& player
 )
 {
+	// プレイヤーを画面中央に配置する
 	camera.x =
-		player.x -
-		kGameWidth / 2.0f;
+		player.x - kGameWidth / 2.0f;
 
 	camera.y =
-		player.y -
-		kGameHeight / 2.0f;
-
+		player.y - kGameHeight / 2.0f;
 
 	// 左端
 	if (camera.x < 0.0f)
@@ -29,30 +30,142 @@ void UpdateTutorialCamera(
 		camera.y = 0.0f;
 	}
 
-
-	// カメラが移動できる最大値
-	float maxTutorialCameraX =
+	// チュートリアルマップの最大カメラ位置
+	float maxCameraX =
 		kMaxTutorialWidth * kMapSize -
 		kGameWidth;
 
-	float maxTutorialCameraY =
+	float maxCameraY =
 		kMaxTutorialHeight * kMapSize -
 		kGameHeight;
 
-
 	// 右端
-	if (camera.x > maxTutorialCameraX)
+	if (camera.x > maxCameraX)
 	{
-		camera.x = maxTutorialCameraX;
+		camera.x = maxCameraX;
 	}
 
 	// 下端
-	if (camera.y > maxTutorialCameraY)
+	if (camera.y > maxCameraY)
 	{
-		camera.y = maxTutorialCameraY;
+		camera.y = maxCameraY;
 	}
 }
 
+// チュートリアルのマップ
+void DrawTutorialMap(
+    int blockTexture,
+    int upBlock,
+    int rightBlock,
+    int downBlock,
+    int leftBlock,
+    const Camera& camera
+)
+{
+    for (int i = 0; i < kMaxTutorialHeight; i++)
+    {
+        for (int j = 0; j < kMaxTutorialWidth; j++)
+        {
+            // ブロックの画面上の位置を計算
+            int posX =
+                kGameX +
+                j * kMapSize -
+                static_cast<int>(camera.x);
+
+            int posY =
+                kGameY +
+                i * kMapSize -
+                static_cast<int>(camera.y);
+
+            // プレイ画面外なら描画しない
+            if (
+                posX + kMapSize <= kGameX ||
+                posX >= kGameX + kGameWidth ||
+                posY + kMapSize <= kGameY ||
+                posY >= kGameY + kGameHeight
+            )
+            {
+                continue;
+            }
+
+            // 通常のブロック
+            if (mapData1[i][j] == 1)
+            {
+                Novice::DrawSprite(
+                    posX,
+                    posY,
+                    blockTexture,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    WHITE
+                );
+            }
+
+            // 上向きブロック
+            if (mapData1[i][j] == kBlockUp)
+            {
+                Novice::DrawSprite(
+                    posX,
+                    posY,
+                    upBlock,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    WHITE
+                );
+            }
+
+            // 右向きブロック
+            if (mapData1[i][j] == kBlockRight)
+            {
+                Novice::DrawSprite(
+                    posX,
+                    posY,
+                    rightBlock,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    WHITE
+                );
+            }
+
+            // 下向きブロック
+            if (mapData1[i][j] == kBlockDown)
+            {
+                Novice::DrawSprite(
+                    posX,
+                    posY,
+                    downBlock,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    WHITE
+                );
+            }
+
+            // 左向きブロック
+            if (mapData1[i][j] == kBlockLeft)
+            {
+                Novice::DrawSprite(
+                    posX,
+                    posY,
+                    leftBlock,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    WHITE
+                );
+            }
+        }
+    }
+}
+
+#pragma endregion
+
+#pragma region // ステージ1 関数定義
+
+// ステージ1のプレイヤーのカメラ移動
 void UpdateStage1Camera(
 	Camera& camera,
 	const Player& player
@@ -103,6 +216,147 @@ void UpdateStage1Camera(
 	}
 }
 
+// ステージ1のマップ
+void DrawStage1Map(
+	int blockTexture,
+	int upBlock,
+	int rightBlock,
+	int downBlock,
+	int leftBlock,
+	const Camera& camera
+)
+{
+	for (int i = 0; i < kMaxStage1Height; i++)
+	{
+		for (int j = 0; j < kMaxStage1Width; j++)
+		{
+			if (mapData2[i][j] == 1)
+			{
+				int posX =
+					kGameX +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					kGameY +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+
+				// プレイ画面外なら描画しない
+				if (
+					posX + kMapSize <= kGameX ||
+					posX >= kGameX + kGameWidth ||
+					posY + kMapSize <= kGameY ||
+					posY >= kGameY + kGameHeight
+					)
+				{
+					continue;
+				}
+
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					blockTexture,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+
+			if (mapData2[i][j] == kBlockUp) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					upBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData2[i][j] == kBlockRight) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					rightBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData2[i][j] == kBlockDown) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					downBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+			if (mapData2[i][j] == kBlockLeft) {
+				int posX =
+					560 +
+					j * kMapSize -
+					static_cast<int>(camera.x);
+
+				int posY =
+					140 +
+					i * kMapSize -
+					static_cast<int>(camera.y);
+
+				Novice::DrawSprite(
+					posX,
+					posY,
+					leftBlock,
+					1.0f,
+					1.0f,
+					0.0f,
+					WHITE
+				);
+			}
+		}
+	}
+}
+
+#pragma endregion
+
+// 背景処理
 void DrawBackground(
 	const Player&player,
 	int bar1Texture,
@@ -211,191 +465,7 @@ void DrawBackground(
 		
 }
 
-void DrawTutorialMap(
-	int blockTexture,
-	int upBlock,
-	int rightBlock,
-	int downBlock,
-	int leftBlock,
-	const Camera& camera
-)
-{
-	for (int i = 0; i < kMaxTutorialHeight; i++)
-	{
-		for (int j = 0; j < kMaxTutorialWidth; j++)
-		{
-			if (mapData1[i][j] == 1)
-			{
-				int posX =
-					kGameX +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					kGameY +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-
-				// プレイ画面外なら描画しない
-				if (
-					posX + kMapSize <= kGameX ||
-					posX >= kGameX + kGameWidth ||
-					posY + kMapSize <= kGameY ||
-					posY >= kGameY + kGameHeight
-					)
-				{
-					continue;
-				}
-
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					blockTexture,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-		}
-	}
-}
-
-void DrawStage1Map(
-	int blockTexture,
-	const Camera& camera
-)
-{
-	for (int i = 0; i < kMaxStage1Height; i++)
-	{
-		for (int j = 0; j < kMaxStage1Width; j++)
-		{
-			if (mapData2[i][j] == 1)
-			{
-				int posX =
-					kGameX +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					kGameY +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-
-				// プレイ画面外なら描画しない
-				if (
-					posX + kMapSize <= kGameX ||
-					posX >= kGameX + kGameWidth ||
-					posY + kMapSize <= kGameY ||
-					posY >= kGameY + kGameHeight
-					)
-				{
-					continue;
-				}
-
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					blockTexture,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-
-			if (mapData[i][j] == kBlockUp) {
-				int posX =
-					560 +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					140 +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					upBlock,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-			if (mapData[i][j] == kBlockRight) {
-				int posX =
-					560 +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					140 +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					rightBlock,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-			if (mapData[i][j] == kBlockDown) {
-				int posX =
-					560 +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					140 +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					downBlock,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-			if (mapData[i][j] == kBlockLeft) {
-				int posX =
-					560 +
-					j * kMapSize -
-					static_cast<int>(camera.x);
-
-				int posY =
-					140 +
-					i * kMapSize -
-					static_cast<int>(camera.y);
-
-				Novice::DrawSprite(
-					posX,
-					posY,
-					leftBlock,
-					1.0f,
-					1.0f,
-					0.0f,
-					WHITE
-				);
-			}
-		}
-	}
-}
-
+// プレイヤーの描画処理
 void DrawPlayer(
 	const Player& player,
 	const Camera& camera,

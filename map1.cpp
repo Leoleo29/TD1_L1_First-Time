@@ -3,6 +3,8 @@
 // マップチップのデータ
 // マップ処理の定義
 
+// #チュートリアル
+
 int mapData1[kMaxTutorialWidth][kMaxTutorialHeight] =
 {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},

@@ -103,22 +103,22 @@ void UpdatePlayer(
 			{
 				hitWall = true;
 			}
-			else if (mapData[y][x] == kBlockUp) {
+			else if (mapData1[y][x] == kBlockUp) {
 				if (player.direction != 0) {
 					hitWall = true;
 				}
 			}
-			else if (mapData[y][x] == kBlockRight) {
+			else if (mapData1[y][x] == kBlockRight) {
 				if (player.direction != 1) {
 					hitWall = true;
 				}
 			}
-			else if (mapData[y][x] == kBlockDown) {
+			else if (mapData1[y][x] == kBlockDown) {
 				if (player.direction != 2) {
 					hitWall = true;
 				}
 			}
-			else if (mapData[y][x] == kBlockLeft) {
+			else if (mapData1[y][x] == kBlockLeft) {
 				if (player.direction != 3) {
 					hitWall = true;
 				}
