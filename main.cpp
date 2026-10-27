@@ -82,7 +82,7 @@ int WINAPI WinMain(
 	char preKeys[256] = { 0 };
 
 	Player player;
-	InitializePlayer(player);
+	InitializeTutorialPlayer(player);
 
 	Camera camera = { 0.0f, 0.0f };
 
@@ -138,12 +138,16 @@ int WINAPI WinMain(
 			// debug用 チュートリアル
 			if (preKeys[DIK_1] == 0 && keys[DIK_1] != 0)
 			{
+				InitializeTutorialPlayer(player);
+				camera = { 0.0f, 0.0f };
 				scene = kSceneTutorial;
 			}
 
-			// debug用 チュートリアル
+			// debug用 ステージ1
 			if (preKeys[DIK_2] == 0 && keys[DIK_2] != 0)
 			{
+				InitializeStage1Player(player);
+				camera = { 0.0f, 0.0f };
 				scene = kSceneStage1;
 			}
 
@@ -152,7 +156,7 @@ int WINAPI WinMain(
 		case kSceneTutorial:
 
 			// プレイヤー更新
-			UpdatePlayer(
+			UpdateTutorialPlayer(
 				player,
 				keys,
 				preKeys
@@ -193,7 +197,7 @@ int WINAPI WinMain(
 		case kSceneStage1:
 
 			// プレイヤー更新
-			UpdatePlayer(
+			UpdateStage1Player(
 				player,
 				keys,
 				preKeys

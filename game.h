@@ -77,10 +77,19 @@ extern int mapData1[kMaxTutorialWidth][kMaxTutorialHeight];
 
 extern int mapData2[kMaxStage1Width][kMaxStage1Height];
 
-void InitializePlayer(Player& player);
+void InitializeTutorialPlayer(Player& player);
 
-// プレイヤー
-void UpdatePlayer(
+void InitializeStage1Player(Player& player);
+
+// プレイヤーの移動処理
+void UpdateTutorialPlayer(
+	Player& player,
+	char* keys,
+	char* preKeys
+);
+
+// プレイヤーの移動処理
+void UpdateStage1Player(
 	Player& player,
 	char* keys,
 	char* preKeys
@@ -94,6 +103,13 @@ void InitializeMap();
 void UpdateTutorialCamera(
 	Camera& camera,
 	const Player& player
+);
+
+// チュートリアルのプレイヤーのカメラ移動
+void UpdateStage1Player(
+	Player& player,
+	char* keys,
+	char* preKeys
 );
 
 // チュートリアルのマップ
