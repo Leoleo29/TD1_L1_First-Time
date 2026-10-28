@@ -85,92 +85,75 @@ int WINAPI WinMain(
 		OutputDebugStringA("gameWindow is nullptr\n");
 	}
 
-	// 画像の読み込み
-	// 壁のデータ
-	int blockTexture = Novice::LoadTexture("./Resources/images/block.png");
-	// プレイヤーのデータ
-	// プレイヤーのデータを変える事!!
-	// 旧
-	int playerTexture = Novice::LoadTexture("./Resources/images/player.png");
-	// 新
-	//int player1=
-	//	Novice::LoadTexture("./Resources/player1.png");  // 下
-	//int player2 =
-	//	Novice::LoadTexture("./Resources/player2.png");  // 上
-	//int player3 =
-	//	Novice::LoadTexture("./Resources/player3.png");  // 右
-	//int player4 =
-	//	Novice::LoadTexture("./Resources/player4.png");  // 下
-
-	// 進行方向　上下のデータ
-	int bar1Texture = Novice::LoadTexture("./Resources/images/bar1.png");
-	// 進行方向　左右のデータ
-	int bar2Texture = Novice::LoadTexture("./Resources/images/bar2.png");
+    // 基本リソース
+    int blockTexture = Novice::LoadTexture("./Resources/images/block.png");
+    int bar1Texture = Novice::LoadTexture("./Resources/images/bar1.png");
+    int bar2Texture = Novice::LoadTexture("./Resources/images/bar2.png");
 
     // 一方通行ブロック
-    int upBlock = Novice::LoadTexture("./images/oneWay_up.png");
-    int rightBlock = Novice::LoadTexture("./images/oneWay_right.png");
-    int downBlock = Novice::LoadTexture("./images/oneWay_down.png");
-    int leftBlock = Novice::LoadTexture("./images/oneWay_left.png");
+    int upBlock = Novice::LoadTexture("./Resources/images/oneWay_up.png");
+    int rightBlock = Novice::LoadTexture("./Resources/images/oneWay_right.png");
+    int downBlock = Novice::LoadTexture("./Resources/images/oneWay_down.png");
+    int leftBlock = Novice::LoadTexture("./Resources/images/oneWay_left.png");
 
     // ワープ画像
-    int warpTexture1 = Novice::LoadTexture("./images/warp1.png");
-    int warpTexture2 = Novice::LoadTexture("./images/warp2.png");
-    int warpTexture3 = Novice::LoadTexture("./images/warp3.png");
-    int warpTexture4 = Novice::LoadTexture("./images/warp4.png");
+    int warpTexture1 = Novice::LoadTexture("./Resources/images/warp1.png");
+    int warpTexture2 = Novice::LoadTexture("./Resources/images/warp2.png");
+    int warpTexture3 = Novice::LoadTexture("./Resources/images/warp3.png");
+    int warpTexture4 = Novice::LoadTexture("./Resources/images/warp4.png");
 
     // トラップ・鍵
-    int trapTexture = Novice::LoadTexture("./images/spikeTrap.png");
-    int keyTexture = Novice::LoadTexture("./images/key.png");
+    int trapTexture = Novice::LoadTexture("./Resources/images/spikeTrap.png");
+    int keyTexture = Novice::LoadTexture("./Resources/images/key.png");
 
     // ハートUI
-    int heart1Texture = Novice::LoadTexture("./images/heart_UI_1.png");
-    int heart2Texture = Novice::LoadTexture("./images/heart_UI_2.png");
-    int heart3Texture = Novice::LoadTexture("./images/heart_UI_3.png");
-    int heart4Texture = Novice::LoadTexture("./images/heart_UI_4.png");
+    int heart1Texture = Novice::LoadTexture("./Resources/images/heart_UI_1.png");
+    int heart2Texture = Novice::LoadTexture("./Resources/images/heart_UI_2.png");
+    int heart3Texture = Novice::LoadTexture("./Resources/images/heart_UI_3.png");
+    int heart4Texture = Novice::LoadTexture("./Resources/images/heart_UI_4.png");
 
-	// シーン画像
-	// タイトル
-	int titleTexture = Novice::LoadTexture("./Resources/images/SCENE_Title.png");
-	// クリア
-	int clearTexture = Novice::LoadTexture("./Resources/images/SCENE_Clear.png");
-	// ゲームオーバー
-	int gameOverTexture = Novice::LoadTexture("./Resources/images/SCENE_GameOver.png");
+    // シーン画像
+    int titleTexture = Novice::LoadTexture("./Resources/images/SCENE_Title.png");
+    int clearTexture = Novice::LoadTexture("./Resources/images/SCENE_Clear.png");
+    int gameOverTexture = Novice::LoadTexture("./Resources/images/SCENE_GameOver.png");
 
-	// ワープホール
-	int warp1 =
-		Novice::LoadTexture("./Resources/images/warp1.png");  // 1
-	//int warp2 =
-	//	Novice::LoadTexture("./Resources/warp2.png");  // 2
-	//int warp3 =
-	//	Novice::LoadTexture("./Resources/warp3.png");  // 3
-	//int warp4 =
-	//	Novice::LoadTexture("./Resources/warp4.png");  // 4
+    // プレイヤー4方向
+    int playerFrontTexture = Novice::LoadTexture("./Resources/images/playerFront.png");
+    int playerBackTexture = Novice::LoadTexture("./Resources/images/playerBack.png");
+    int playerLeftTexture = Novice::LoadTexture("./Resources/images/playerLeft.png");
+    int playerRightTexture = Novice::LoadTexture("./Resources/images/playerRight.png");
+
+    // BGM
+    const int kTitleBGMHandle =
+        Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-173.mp3");
+
+    const int kPlayHandle =
+        Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-155.mp3");
 
     const int kStage1Handle =
-        Novice::LoadAudio("./Sounds/MusMus-BGM-112.mp3");
+        Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-112.mp3");
 
     const int kClearHandle =
-        Novice::LoadAudio("./Sounds/MusMus-BGM-156.mp3");
+        Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-156.mp3");
 
     const int kGameOverHandle =
-        Novice::LoadAudio("./Sounds/MusMus-BGM-110.mp3");
+        Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-110.mp3");
 
     // 効果音
     const int kTrapHandle =
-        Novice::LoadAudio("./Sounds/剣で斬る.mp3");
+        Novice::LoadAudio("./Resources/Sounds/damage.wav");
 
     const int kWarpHandle =
-        Novice::LoadAudio("./Sounds/おばけの笑い声2.mp3");
+        Novice::LoadAudio("./Resources/Sounds/Motion-Slide07-1(Mid).mp3");
 
     const int kTruckHandle =
-        Novice::LoadAudio("./Sounds/足音1.mp3");
+        Novice::LoadAudio("./Resources/Sounds/Footsteps03-2L.mp3");
 
     const int kKeyHandle =
-        Novice::LoadAudio("./Sounds/ジャジャーン2.mp3");
+        Novice::LoadAudio("./Resources/Sounds/Onoma-Sparkle12-1(High).mp3");
 
     const int kGoalHandle =
-        Novice::LoadAudio("./Sounds/マリンバグリッサンド3.mp3");
+        Novice::LoadAudio("./Resources/Sounds/Onoma-Sparkle10-3(Long).mp3");
 
     char keys[256] = {};
     char preKeys[256] = {};
