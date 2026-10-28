@@ -1,45 +1,64 @@
+
 #include "game.h"
 
-// プレイヤー初期化
+bool keyCollected1[kMaxTutorialHeight][kMaxTutorialWidth] = {};
+bool keyCollected2[kMaxStage1Height][kMaxStage1Width] = {};
+
 void InitializeTutorialPlayer(Player& player)
 {
     player.x = 1 * kMapSize + kMapSize / 2.0f;
     player.y = 18 * kMapSize + kMapSize / 2.0f;
-
     player.direction = 2;
     player.isMoving = false;
     player.speed = 10.0f;
 
-    // ワープ設定
     player.warpLocked = false;
     player.warpMapX = -1;
     player.warpMapY = -1;
 
-    // HP設定
     player.hp = kPlayerMaxHP;
     player.invincibleTimer = 0;
+    player.keyCount = 0;
+    player.showKeyArrow = false;
 }
 
 void InitializeStage1Player(Player& player)
 {
     player.x = 1 * kMapSize + kMapSize / 2.0f;
     player.y = 38 * kMapSize + kMapSize / 2.0f;
-
     player.direction = 2;
     player.isMoving = false;
     player.speed = 10.0f;
 
-    // ワープ設定
     player.warpLocked = false;
     player.warpMapX = -1;
     player.warpMapY = -1;
 
-    // HP設定
     player.hp = kPlayerMaxHP;
     player.invincibleTimer = 0;
+    player.keyCount = 0;
+    player.showKeyArrow = false;
 }
 
-// 移動できるか判定
+void InitializeMap()
+{
+    for (int y = 0; y < kMaxTutorialHeight; y++)
+    {
+        for (int x = 0; x < kMaxTutorialWidth; x++)
+        {
+            keyCollected1[y][x] = false;
+        }
+    }
+
+    for (int y = 0; y < kMaxStage1Height; y++)
+    {
+        for (int x = 0; x < kMaxStage1Width; x++)
+        {
+            keyCollected2[y][x] = false;
+        }
+    }
+}
+
 template <int Height, int Width>
 bool CanMove(
     float nextX,
@@ -64,75 +83,37 @@ bool CanMove(
     {
         for (int x = leftMapX; x <= rightMapX; x++)
         {
-            if (x < 0 || x >= Width ||
-                y < 0 || y >= Height)
+            if (x < 0 || x >= Width || y < 0 || y >= Height)
             {
                 return false;
             }
 
             int tile = map[y][x];
 
-            // 壁
-            if (tile == 1)
-            {
-                return false;
-            }
-
-            // 上方向の一方通行
-            if (tile == kBlockUp && direction != 0)
-            {
-                return false;
-            }
-
-            // 右方向の一方通行
-            if (tile == kBlockRight && direction != 1)
-            {
-                return false;
-            }
-
-            // 下方向の一方通行
-            if (tile == kBlockDown && direction != 2)
-            {
-                return false;
-            }
-
-            // 左方向の一方通行
-            if (tile == kBlockLeft && direction != 3)
-            {
-                return false;
-            }
-
-            // とげは通過できる
+            if (tile == 1) return false;
+            if (tile == kBlockUp && direction != 0) return false;
+            if (tile == kBlockRight && direction != 1) return false;
+            if (tile == kBlockDown && direction != 2) return false;
+            if (tile == kBlockLeft && direction != 3) return false;
         }
     }
 
     return true;
 }
 
-// ワープ処理
 template <int Height, int Width>
-void UpdateWarp(
-    Player& player,
-    const int(&map)[Height][Width]
-)
+void UpdateWarp(Player& player, const int(&map)[Height][Width])
 {
     int playerMapX = static_cast<int>(player.x) / kMapSize;
     int playerMapY = static_cast<int>(player.y) / kMapSize;
 
-    // ワープ先のマスから出たら再ワープ可能
-    if (player.warpLocked)
+    if (player.warpLocked &&
+        (playerMapX != player.warpMapX || playerMapY != player.warpMapY))
     {
-        if (playerMapX != player.warpMapX ||
-            playerMapY != player.warpMapY)
-        {
-            player.warpLocked = false;
-        }
+        player.warpLocked = false;
     }
 
-    if (player.warpLocked)
-    {
-        return;
-    }
+    if (player.warpLocked) return;
 
     if (playerMapX < 0 || playerMapX >= Width ||
         playerMapY < 0 || playerMapY >= Height)
@@ -140,16 +121,12 @@ void UpdateWarp(
         return;
     }
 
-    if (map[playerMapY][playerMapX] != kBlockWarp)
-    {
-        return;
-    }
+    if (map[playerMapY][playerMapX] != kBlockWarp) return;
 
     int warpX[Height * Width];
     int warpY[Height * Width];
     int warpCount = 0;
 
-    // ワープ地点を上の行から順番に集める
     for (int y = 0; y < Height; y++)
     {
         for (int x = 0; x < Width; x++)
@@ -163,223 +140,140 @@ void UpdateWarp(
         }
     }
 
-    // ワープ地点が2つ未満ならワープしない
-    if (warpCount < 2)
-    {
-        return;
-    }
+    if (warpCount < 2) return;
 
     int currentWarp = -1;
 
     for (int i = 0; i < warpCount; i++)
     {
-        if (warpX[i] == playerMapX &&
-            warpY[i] == playerMapY)
+        if (warpX[i] == playerMapX && warpY[i] == playerMapY)
         {
             currentWarp = i;
             break;
         }
     }
 
-    if (currentWarp == -1)
-    {
-        return;
-    }
+    if (currentWarp == -1) return;
 
-    // 0番と1番、2番と3番……をペアにする
-    int destinationWarp;
+    int destinationWarp =
+        (currentWarp % 2 == 0) ? currentWarp + 1 : currentWarp - 1;
 
-    if (currentWarp % 2 == 0)
-    {
-        destinationWarp = currentWarp + 1;
-    }
-    else
-    {
-        destinationWarp = currentWarp - 1;
-    }
+    if (destinationWarp >= warpCount) return;
 
-    // ペアのないワープ地点は無効
-    if (destinationWarp >= warpCount)
-    {
-        return;
-    }
-
-    // 移動先のマスの中央へ移動
-    player.x =
-        warpX[destinationWarp] * kMapSize
-        + kMapSize / 2.0f;
-
-    player.y =
-        warpY[destinationWarp] * kMapSize
-        + kMapSize / 2.0f;
+    player.x = warpX[destinationWarp] * kMapSize + kMapSize / 2.0f;
+    player.y = warpY[destinationWarp] * kMapSize + kMapSize / 2.0f;
 
     player.warpLocked = true;
     player.warpMapX = warpX[destinationWarp];
     player.warpMapY = warpY[destinationWarp];
 }
 
-// とげブロックとの当たり判定
 template <int Height, int Width>
-bool CheckSpikeCollision(
-    const Player& player,
-    const int(&map)[Height][Width]
-)
+bool CheckSpikeCollision(const Player& player, const int(&map)[Height][Width])
 {
     const float halfSize = kMapSize / 2.0f;
 
-    float playerLeft = player.x - halfSize;
-    float playerRight = player.x + halfSize;
-    float playerTop = player.y - halfSize;
-    float playerBottom = player.y + halfSize;
+    float left = player.x - halfSize;
+    float right = player.x + halfSize;
+    float top = player.y - halfSize;
+    float bottom = player.y + halfSize;
 
-    int leftMapX =
-        static_cast<int>(playerLeft) / kMapSize;
+    int leftX = static_cast<int>(left) / kMapSize;
+    int rightX = static_cast<int>(right - 1.0f) / kMapSize;
+    int topY = static_cast<int>(top) / kMapSize;
+    int bottomY = static_cast<int>(bottom - 1.0f) / kMapSize;
 
-    int rightMapX =
-        static_cast<int>(playerRight - 1.0f) / kMapSize;
-
-    int topMapY =
-        static_cast<int>(playerTop) / kMapSize;
-
-    int bottomMapY =
-        static_cast<int>(playerBottom - 1.0f) / kMapSize;
-
-    for (int y = topMapY; y <= bottomMapY; y++)
+    for (int y = topY; y <= bottomY; y++)
     {
-        for (int x = leftMapX; x <= rightMapX; x++)
+        for (int x = leftX; x <= rightX; x++)
         {
-            if (x < 0 || x >= Width ||
-                y < 0 || y >= Height)
-            {
-                continue;
-            }
-
-            if (map[y][x] == kBlockSpike)
-            {
-                return true;
-            }
+            if (x < 0 || x >= Width || y < 0 || y >= Height) continue;
+            if (map[y][x] == kBlockSpike) return true;
         }
     }
 
     return false;
 }
 
-// とげによるダメージ処理
 template <int Height, int Width>
-void UpdateSpikeDamage(
-    Player& player,
-    const int(&map)[Height][Width]
-)
+void UpdateSpikeDamage(Player& player, const int(&map)[Height][Width])
 {
-    // 無敵時間を減らす
     if (player.invincibleTimer > 0)
     {
         player.invincibleTimer--;
     }
 
-    // すでに無敵時間中ならダメージを受けない
-    if (player.invincibleTimer > 0)
-    {
-        return;
-    }
+    if (player.invincibleTimer > 0) return;
+    if (!CheckSpikeCollision(player, map)) return;
 
-    // とげに触れていなければ何もしない
-    if (!CheckSpikeCollision(player, map))
-    {
-        return;
-    }
-
-    // HPを1減らす
     player.hp--;
 
-    // HPが0未満にならないようにする
-    if (player.hp < 0)
-    {
-        player.hp = 0;
-    }
+    if (player.hp < 0) player.hp = 0;
 
-    // 無敵時間を開始
     player.invincibleTimer = kInvincibleTime;
 }
 
-// チュートリアル更新
-void UpdateTutorialPlayer(
+template <int Height, int Width>
+void UpdateKeyCollection(
     Player& player,
-    char* keys,
-    char* preKeys
+    const int(&map)[Height][Width],
+    bool(&collected)[Height][Width]
 )
 {
-    // スペースキーで方向を変更
-    if (preKeys[DIK_SPACE] == 0 &&
-        keys[DIK_SPACE] != 0)
+    int mapX = static_cast<int>(player.x) / kMapSize;
+    int mapY = static_cast<int>(player.y) / kMapSize;
+
+    if (mapX < 0 || mapX >= Width || mapY < 0 || mapY >= Height) return;
+
+    if (map[mapY][mapX] == kBlockKey && !collected[mapY][mapX])
     {
-        player.direction--;
-
-        if (player.direction < 0)
-        {
-            player.direction = 3;
-        }
-
-        player.isMoving = true;
+        collected[mapY][mapX] = true;
+        player.keyCount++;
     }
-
-    if (player.isMoving)
-    {
-        float nextX = player.x;
-        float nextY = player.y;
-
-        if (player.direction == 0)
-        {
-            nextY -= player.speed;
-        }
-        else if (player.direction == 1)
-        {
-            nextX += player.speed;
-        }
-        else if (player.direction == 2)
-        {
-            nextY += player.speed;
-        }
-        else
-        {
-            nextX -= player.speed;
-        }
-
-        if (!CanMove(nextX, nextY, player.direction, mapData1))
-        {
-            player.isMoving = false;
-        }
-        else
-        {
-            player.x = nextX;
-            player.y = nextY;
-        }
-    }
-
-    // ワープ判定
-    UpdateWarp(player, mapData1);
-
-    // とげによるダメージ判定
-    UpdateSpikeDamage(player, mapData1);
 }
 
-// ステージ1更新
-void UpdateStage1Player(
+template <int Height, int Width>
+bool CheckGoal(const Player& player, const int(&map)[Height][Width])
+{
+    if (player.keyCount < kRequiredKeyCount) return false;
+
+    int mapX = static_cast<int>(player.x) / kMapSize;
+    int mapY = static_cast<int>(player.y) / kMapSize;
+
+    if (mapX < 0 || mapX >= Width || mapY < 0 || mapY >= Height) return false;
+
+    return map[mapY][mapX] == kBlockGoal;
+}
+
+bool IsTutorialGoalReached(const Player& player)
+{
+    return CheckGoal(player, mapData1);
+}
+
+bool IsStage1GoalReached(const Player& player)
+{
+    return CheckGoal(player, mapData2);
+}
+
+template <int Height, int Width>
+void UpdatePlayerCommon(
     Player& player,
     char* keys,
-    char* preKeys
+    char* preKeys,
+    const int(&map)[Height][Width],
+    bool(&collected)[Height][Width]
 )
 {
-    // スペースキーで方向を変更
-    if (preKeys[DIK_SPACE] == 0 &&
-        keys[DIK_SPACE] != 0)
+    if (preKeys[DIK_H] == 0 && keys[DIK_H] != 0)
+    {
+        player.showKeyArrow = !player.showKeyArrow;
+    }
+
+    if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
     {
         player.direction--;
 
-        if (player.direction < 0)
-        {
-            player.direction = 3;
-        }
+        if (player.direction < 0) player.direction = 3;
 
         player.isMoving = true;
     }
@@ -389,24 +283,12 @@ void UpdateStage1Player(
         float nextX = player.x;
         float nextY = player.y;
 
-        if (player.direction == 0)
-        {
-            nextY -= player.speed;
-        }
-        else if (player.direction == 1)
-        {
-            nextX += player.speed;
-        }
-        else if (player.direction == 2)
-        {
-            nextY += player.speed;
-        }
-        else
-        {
-            nextX -= player.speed;
-        }
+        if (player.direction == 0) nextY -= player.speed;
+        else if (player.direction == 1) nextX += player.speed;
+        else if (player.direction == 2) nextY += player.speed;
+        else nextX -= player.speed;
 
-        if (!CanMove(nextX, nextY, player.direction, mapData2))
+        if (!CanMove(nextX, nextY, player.direction, map))
         {
             player.isMoving = false;
         }
@@ -417,9 +299,17 @@ void UpdateStage1Player(
         }
     }
 
-    // ワープ判定
-    UpdateWarp(player, mapData2);
+    UpdateWarp(player, map);
+    UpdateKeyCollection(player, map, collected);
+    UpdateSpikeDamage(player, map);
+}
 
-    // とげによるダメージ判定
-    UpdateSpikeDamage(player, mapData2);
+void UpdateTutorialPlayer(Player& player, char* keys, char* preKeys)
+{
+    UpdatePlayerCommon(player, keys, preKeys, mapData1, keyCollected1);
+}
+
+void UpdateStage1Player(Player& player, char* keys, char* preKeys)
+{
+    UpdatePlayerCommon(player, keys, preKeys, mapData2, keyCollected2);
 }

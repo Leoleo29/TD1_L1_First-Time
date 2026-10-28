@@ -28,7 +28,3 @@ int mapData1[kMaxTutorialWidth][kMaxTutorialHeight] =
 	{1,0,0,1,0,0,0,0,0,0,0,0,0,0,5,0,0,0,1,1},
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
-
-void InitializeMap()
-{
-}
