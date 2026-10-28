@@ -83,13 +83,13 @@ int WINAPI WinMain(
 
 	// 一方通行 のデータ
 	int upBlock =
-		Novice::LoadTexture("./oneWay_up.png");     // 上
+		Novice::LoadTexture("./images/oneWay_up.png");     // 上
 	int rightBlock =
-		Novice::LoadTexture("./oneWay_right.png");  // 右
+		Novice::LoadTexture("./images/oneWay_right.png");  // 右
 	int downBlock =
-		Novice::LoadTexture("./oneWay_down.png");   // 下
+		Novice::LoadTexture("./images/oneWay_down.png");   // 下
 	int leftBlock =
-		Novice::LoadTexture("./oneWay_left.png");   // 左
+		Novice::LoadTexture("./images/oneWay_left.png");   // 左
 
 	// ワープホール
 	//int warp1 =
