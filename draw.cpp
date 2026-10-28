@@ -39,9 +39,9 @@ void DrawMapCommon(
     int rightBlock,
     int downBlock,
     int leftBlock,
-    int warp1,
-    int spikeTrap,
-    const Camera& camera
+    const Camera& camera,
+    const int(&map)[Height][Width],
+    bool(&collected)[Height][Width]
 )
 {
     for (int y = 0; y < Height; y++)
@@ -80,11 +80,19 @@ void DrawMapCommon(
                 break;
 
             case kBlockWarp:
-                texture = warp1;
+                Novice::DrawBox(
+                    posX, posY, kMapSize, kMapSize,
+                    0.0f, 0xAA55FFFF, kFillModeSolid
+                );
                 break;
 
             case kBlockSpike:
-                texture = spikeTrap;
+                Novice::DrawTriangle(
+                    posX, posY + kMapSize,
+                    posX + kMapSize / 2, posY,
+                    posX + kMapSize, posY + kMapSize,
+                    0xFF3333FF, kFillModeSolid
+                );
                 break;
 
             case kBlockKey:
@@ -151,6 +159,8 @@ void DrawTutorialMap(
     int rightBlock,
     int downBlock,
     int leftBlock,
+    int warp1,
+    int spikeTrap,
     const Camera& camera
 )
 {
@@ -205,13 +215,15 @@ void DrawBackground(const Player& player, int bar1Texture, int bar2Texture)
     }
 }
 
-             case kBlockWarp:
-                 texture = warp1;
-                 break;
+void DrawPlayer(const Player& player, const Camera& camera, int playerTexture)
+{
+    int drawX = kGameX + static_cast<int>(
+        player.x - camera.x - kMapSize / 2.0f
+        );
 
-             case kBlockSpike:
-                 texture = spikeTrap;
-                 break;
+    int drawY = kGameY + static_cast<int>(
+        player.y - camera.y - kMapSize / 2.0f
+        );
 
     if (player.invincibleTimer > 0 &&
         (player.invincibleTimer / 5) % 2 == 0)

@@ -82,13 +82,12 @@ bool IsStage1GoalReached(const Player& player);
 void UpdateTutorialCamera(Camera& camera, const Player& player);
 void UpdateStage1Camera(Camera& camera, const Player& player);
 
-// マップ描画
 void DrawTutorialMap(
-    int blockTexture,
-    int upBlock,
+    int blockTexture, 
+    int upBlock, 
     int rightBlock,
-    int downBlock,
-    int leftBlock,
+    int downBlock, 
+    int leftBlock, 
     int warp1,
     int spikeTrap,
     const Camera& camera
@@ -103,13 +102,6 @@ void DrawStage1Map(
     int warp1,
     int spikeTrap,
     const Camera& camera
-);
-
-// 背景
-void DrawBackground(
-    const Player& player,
-    int bar1Texture,
-    int bar2Texture
 );
 
 void DrawBackground(const Player& player, int bar1Texture, int bar2Texture);
