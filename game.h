@@ -1,159 +1,127 @@
+
 #pragma once
 #include <Novice.h>
-
-// 宣言
 
 // シーン処理
 enum Scene
 {
-	kSceneTitle,
-	kSceneTutorial,
-	kSceneStage1,
-	kSceneClear,
-	kSceneGameOver
+    kSceneTitle,
+    kSceneTutorial,
+    kSceneStage1,
+    kSceneClear,
+    kSceneGameOver
 };
 
 // ウィンドウサイズ
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;
-// プレイ画面サイズ
+
 const int kGameWidth = 800;
 const int kGameHeight = 800;
-// プレイ画面の左上
-const int kGameX =
-(kWindowWidth - kGameWidth) / 2;
 
-const int kGameY =
-(kWindowHeight - kGameHeight) / 2;
+const int kGameX = (kWindowWidth - kGameWidth) / 2;
+const int kGameY = (kWindowHeight - kGameHeight) / 2;
 
-// プレイ画面の中央
-const float kGameCenterX =
-kGameWidth / 2.0f;
+const float kGameCenterX = kGameWidth / 2.0f;
+const float kGameCenterY = kGameHeight / 2.0f;
 
-const float kGameCenterY =
-kGameHeight / 2.0f;
-
-// チュートリアルマップのサイズ
-// 20 x 20
+// マップサイズ
 const int kMaxTutorialWidth = 20;
 const int kMaxTutorialHeight = 20;
 
-// チュートリアルマップのサイズ
-// 40 x 40
 const int kMaxStage1Width = 40;
 const int kMaxStage1Height = 40;
 
-// マップタイルの大きさ
 const int kMapSize = 80;
 
 // マップチップ
-// 一方通行
 const int kBlockUp = 2;
 const int kBlockRight = 3;
 const int kBlockDown = 4;
 const int kBlockLeft = 5;
+const int kBlockWarp = 6;
+
+// ワープ地点の最大数
+const int kMaxWarpCount = 200;
 
 // プレイヤー
 struct Player
 {
-	float x;
-	float y;
+    float x;
+    float y;
 
-	int direction;
+    int direction;
+    bool isMoving;
+    float speed;
 
-	bool isMoving;
-
-	float speed;
+    // ワープ直後の連続ワープ防止
+    bool warpLocked;
+    int warpMapX;
+    int warpMapY;
 };
 
 // カメラ
 struct Camera
 {
-	float x;
-	float y;
+    float x;
+    float y;
 };
 
+// マップデータ
 extern int mapData1[kMaxTutorialWidth][kMaxTutorialHeight];
-
 extern int mapData2[kMaxStage1Width][kMaxStage1Height];
 
+// プレイヤー初期化
 void InitializeTutorialPlayer(Player& player);
-
 void InitializeStage1Player(Player& player);
 
-// プレイヤーの移動処理
-void UpdateTutorialPlayer(
-	Player& player,
-	char* keys,
-	char* preKeys
-);
+// プレイヤー更新
+void UpdateTutorialPlayer(Player& player, char* keys, char* preKeys);
+void UpdateStage1Player(Player& player, char* keys, char* preKeys);
 
-// プレイヤーの移動処理
-void UpdateStage1Player(
-	Player& player,
-	char* keys,
-	char* preKeys
+// ワープ処理
+void UpdateWarp(
+    Player& player,
+    const int map[][kMaxTutorialHeight],
+    int width,
+    int height
 );
 
 void InitializeMap();
 
-#pragma region // チュートリアル 関数宣言
+// カメラ
+void UpdateTutorialCamera(Camera& camera, const Player& player);
+void UpdateStage1Camera(Camera& camera, const Player& player);
 
-// チュートリアルのプレイヤーのカメラ移動
-void UpdateTutorialCamera(
-	Camera& camera,
-	const Player& player
-);
-
-// チュートリアルのプレイヤーのカメラ移動
-void UpdateStage1Player(
-	Player& player,
-	char* keys,
-	char* preKeys
-);
-
-// チュートリアルのマップ
+// マップ描画
 void DrawTutorialMap(
-	int blockTexture,
-	int upBlock,
-	int rightBlock,
-	int downBlock,
-	int leftBlock,
-	const Camera& camera
+    int blockTexture,
+    int upBlock,
+    int rightBlock,
+    int downBlock,
+    int leftBlock,
+    const Camera& camera
 );
 
-#pragma endregion
-
-#pragma region // ステージ1 関数宣言
-
-// ステージ1のプレイヤーのカメラ移動
-void UpdateStage1Camera(
-	Camera& camera,
-	const Player& player
-);
-
-// ステージ1のマップ
 void DrawStage1Map(
-	int blockTexture,
-	int upBlock,
-	int rightBlock,
-	int downBlock,
-	int leftBlock,
-	const Camera& camera
+    int blockTexture,
+    int upBlock,
+    int rightBlock,
+    int downBlock,
+    int leftBlock,
+    const Camera& camera
 );
 
-#pragma endregion
-
-// 背景処理
+// 背景
 void DrawBackground(
-	const Player& player,
-	int bar1Texture,
-	int bar2Texture
+    const Player& player,
+    int bar1Texture,
+    int bar2Texture
 );
 
-// プレイヤーの描画処理
+// プレイヤー描画
 void DrawPlayer(
-	const Player& player,
-	const Camera& camera,
-	int playerTexture
+    const Player& player,
+    const Camera& camera,
+    int playerTexture
 );
