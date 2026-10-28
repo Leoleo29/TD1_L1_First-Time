@@ -121,7 +121,21 @@ int WINAPI WinMain(
 	// ゲームオーバー画面
 	const int kStartHandle =
 		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-110.mp3");
-	// 
+	// トラップ 
+	const int kStartHandle =
+		Novice::LoadAudio("./Resources/Sounds/斬撃1.mp3");
+	// ワープ
+	const int kStartHandle =
+		Novice::LoadAudio("./Resources/Sounds/おばけの笑い声2.mp3");
+	// プレイヤー 足音
+	const int kStartHandle =
+		Novice::LoadAudio("./Resources/Sounds/足音1.mp3");
+	// 鍵ゲット
+	const int kStartHandle =
+		Novice::LoadAudio("./Resources/Sounds/ジャジャーン2.mp3");
+	// ゴール
+	const int kStartHandle =
+		Novice::LoadAudio("./Resources/Sounds/マリンバグリッサンド3.mp3");
 
 	char keys[256] = {};
 	char preKeys[256] = {};
