@@ -1,4 +1,3 @@
-
 #pragma once
 #include <Novice.h>
 
@@ -13,15 +12,19 @@ enum Scene
 
 const int kWindowWidth = 1920;
 const int kWindowHeight = 1080;
+
 const int kGameWidth = 800;
 const int kGameHeight = 800;
+
 const int kGameX = (kWindowWidth - kGameWidth) / 2;
 const int kGameY = (kWindowHeight - kGameHeight) / 2;
 
 const int kMaxTutorialWidth = 20;
 const int kMaxTutorialHeight = 20;
+
 const int kMaxStage1Width = 40;
 const int kMaxStage1Height = 40;
+
 const int kMapSize = 80;
 
 const int kBlockUp = 2;
@@ -33,7 +36,7 @@ const int kBlockSpike = 7;
 const int kBlockKey = 8;
 const int kBlockGoal = 9;
 
-const int kRequiredKeyCount = 8;
+const int kRequiredKeyCount = 4;
 const int kPlayerMaxHP = 4;
 const int kInvincibleTime = 60;
 
@@ -41,6 +44,7 @@ struct Player
 {
     float x;
     float y;
+
     int direction;
     bool isMoving;
     float speed;
@@ -83,13 +87,17 @@ void UpdateTutorialCamera(Camera& camera, const Player& player);
 void UpdateStage1Camera(Camera& camera, const Player& player);
 
 void DrawTutorialMap(
-    int blockTexture, 
-    int upBlock, 
+    int blockTexture,
+    int upBlock,
     int rightBlock,
-    int downBlock, 
-    int leftBlock, 
-    int warp1,
-    int spikeTrap,
+    int downBlock,
+    int leftBlock,
+    int warpTexture1,
+    int warpTexture2,
+    int warpTexture3,
+    int warpTexture4,
+    int trapTexture,
+    int keyTexture,
     const Camera& camera
 );
 
@@ -99,11 +107,36 @@ void DrawStage1Map(
     int rightBlock,
     int downBlock,
     int leftBlock,
-    int warp1,
-    int spikeTrap,
+    int warpTexture1,
+    int warpTexture2,
+    int warpTexture3,
+    int warpTexture4,
+    int trapTexture,
+    int keyTexture,
     const Camera& camera
 );
 
-void DrawBackground(const Player& player, int bar1Texture, int bar2Texture);
-void DrawPlayer(const Player& player, const Camera& camera, int playerTexture);
-void DrawKeyArrow(const Player& player, const Camera& camera, bool isTutorial);
+void DrawBackground(
+    const Player& player,
+    int bar1Texture,
+    int bar2Texture,
+    int heart1Texture,
+    int heart2Texture,
+    int heart3Texture,
+    int heart4Texture
+);
+
+void DrawPlayer(
+    const Player& player,
+    const Camera& camera,
+    int playerFrontTexture,
+    int playerBackTexture,
+    int playerLeftTexture,
+    int playerRightTexture
+);
+
+void DrawKeyArrow(
+    const Player& player,
+    const Camera& camera,
+    bool isTutorial
+);

@@ -2,341 +2,600 @@
 #include <Novice.h>
 #include <Windows.h>
 #include <cstring>
+#include <cmath>
 #include "game.h"
 #include "fullScreen.h"
 
 const char kWindowTitle[] = "台パンするキンタロウ・ホズミ  ゼン";
 
-int WINAPI WinMain(
-	_In_ HINSTANCE,
-	_In_opt_ HINSTANCE,
-	_In_ LPSTR,
-	_In_ int
+// BGMを切り替える
+static int currentBgmHandle = -1;
+static int currentBgmVoice = -1;
+static Scene previousBgmScene = kSceneGameOver;
+static bool hasStartedBgm = false;
+
+void UpdateBGM(
+    Scene scene,
+    int titleBGM,
+    int playBGM,
+    int stage1BGM,
+    int clearBGM,
+    int gameOverBGM
 )
 {
-	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
+    if (hasStartedBgm && scene == previousBgmScene)
+    {
+        return;
+    }
 
-	HWND gameWindow = GetActiveWindow();
-	RECT windowRect = {};
-	LONG_PTR windowStyle = 0;
-	bool isFullScreen = false;
+    // 前のBGMを停止
+    if (currentBgmVoice != -1 &&
+        Novice::IsPlayingAudio(currentBgmVoice))
+    {
+        Novice::StopAudio(currentBgmVoice);
+    }
 
-	if (gameWindow == nullptr)
-	{
-		OutputDebugStringA("gameWindow is nullptr\n");
-	}
+    switch (scene)
+    {
+    case kSceneTitle:
+        currentBgmHandle = titleBGM;
+        break;
 
-	// 画像の読み込み
-	// 壁のデータ
-	int blockTexture = Novice::LoadTexture("./images/block.png");
-	// プレイヤーのデータ
-	// プレイヤーのデータを変える事!!
-	// 旧
-	int playerTexture = Novice::LoadTexture("./images/player.png");
-	// 新
-	//int player1=
-	//	Novice::LoadTexture("./player1.png");  // 下
-	//int player2 =
-	//	Novice::LoadTexture("./player2.png");  // 上
-	//int player3 =
-	//	Novice::LoadTexture("./player3.png");  // 右
-	//int player4 =
-	//	Novice::LoadTexture("./player4.png");  // 下
+    case kSceneTutorial:
+        currentBgmHandle = playBGM;
+        break;
 
-	// 進行方向　上下のデータ
-	int bar1Texture = Novice::LoadTexture("./images/bar1.png");
-	// 進行方向　左右のデータ
-	int bar2Texture = Novice::LoadTexture("./images/bar2.png");
+    case kSceneStage1:
+        currentBgmHandle = stage1BGM;
+        break;
 
-	// 一方通行 のデータ
-	int upBlock = Novice::LoadTexture("./images/oneWay_up.png");     // 上
-	int rightBlock = Novice::LoadTexture("./images/oneWay_right.png");  // 右
-	int downBlock = Novice::LoadTexture("./images/oneWay_down.png");   // 下
-	int leftBlock = Novice::LoadTexture("./images/oneWay_left.png");   // 左
+    case kSceneClear:
+        currentBgmHandle = clearBGM;
+        break;
 
-	// シーン画像
-	// タイトル
-	int titleTexture = Novice::LoadTexture("./images/SCENE_Title.png");
-	// クリア
-	int clearTexture = Novice::LoadTexture("./images/SCENE_Clear.png");
-	// ゲームオーバー
-	int gameOverTexture = Novice::LoadTexture("./images/SCENE_GameOver.png");
+    case kSceneGameOver:
+        currentBgmHandle = gameOverBGM;
+        break;
+    }
 
-	// ワープホール
-	int warp1 =
-		Novice::LoadTexture("./images/warp1.png");  // 1
-	//int warp2 =
-	//	Novice::LoadTexture("./warp2.png");  // 2
-	//int warp3 =
-	//	Novice::LoadTexture("./warp3.png");  // 3
-	//int warp4 =
-	//	Novice::LoadTexture("./warp4.png");  // 4
+    // BGMはループ再生
+    currentBgmVoice =
+        Novice::PlayAudio(currentBgmHandle, true, 0.5f);
 
-	// ゴール のデータ
-	/*int goal =
-		Novice::LoadTexture("./goal.png");*/
+    previousBgmScene = scene;
+    hasStartedBgm = true;
+}
 
-		// トラップ
-	int spikeTrap =
-		Novice::LoadTexture("./images/spikeTrap.png");
+int WINAPI WinMain(
+    _In_ HINSTANCE,
+    _In_opt_ HINSTANCE,
+    _In_ LPSTR,
+    _In_ int
+)
+{
+    Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
 
-	// ハート(体力回復)
-	/*int heart =
-			   Novice::LoadTexture("./heart.png");*/
+    HWND gameWindow = GetActiveWindow();
+    RECT windowRect = {};
+    LONG_PTR windowStyle = 0;
+    bool isFullScreen = false;
 
-			   // 宝石
-			   //int jewelry1 =
-			   //	Novice::LoadTexture("./jewelry1.png");  // 1 (赤)
-			   //int jewelry2 =
-			   //	Novice::LoadTexture("./jewelry2.png");  // 2 (青)
-			   //int jewelry3 =
-			   //	Novice::LoadTexture("./jewelry3.png");  // 3 (緑)
-			   //int jewelry4 =
-						  //	Novice::LoadTexture("./jewelry4.png");  // 4 (黄色)
+    // 基本リソース
+    int blockTexture = Novice::LoadTexture("./images/block.png");
+    int bar1Texture = Novice::LoadTexture("./images/bar1.png");
+    int bar2Texture = Novice::LoadTexture("./images/bar2.png");
 
-						  // UI
-						  // プレイヤーの体力
-						  //int heart_UI_1 =
-						  //	Novice::LoadTexture("./heart_UI_1.png");  // ハート x 4
-						  //int heart_UI_2 =
-						  //	Novice::LoadTexture("./heart_UI_2.png");  // ハート x 3
-						  //int heart_UI_3 =
-						  //	Novice::LoadTexture("./heart_UI_3.png");  // ハート x 2
-						  //int heart_UI_4 =
-						  //	Novice::LoadTexture("./heart_UI_4.png");  // ハート x 1
+    // 一方通行ブロック
+    int upBlock = Novice::LoadTexture("./images/oneWay_up.png");
+    int rightBlock = Novice::LoadTexture("./images/oneWay_right.png");
+    int downBlock = Novice::LoadTexture("./images/oneWay_down.png");
+    int leftBlock = Novice::LoadTexture("./images/oneWay_left.png");
 
-	// ハンドルの取得
-	// タイトル
-	const int titleBGMHandle =
-		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-173.mp3");
-	// プレイ画面 (チュートリアル)
-	const int kMokugyoHandle =
-		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-155.mp3");
-	//  プレイ画面 (ステージ1)
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-112.mp3");
-	// クリア画面
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-156.mp3");
-	// ゲームオーバー画面
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/MusMus-BGM-110.mp3");
-	// トラップ 
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/斬撃1.mp3");
-	// ワープ
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/おばけの笑い声2.mp3");
-	// プレイヤー 足音
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/足音1.mp3");
-	// 鍵ゲット
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/ジャジャーン2.mp3");
-	// ゴール
-	const int kStartHandle =
-		Novice::LoadAudio("./Resources/Sounds/マリンバグリッサンド3.mp3");
+    // ワープ画像
+    int warpTexture1 = Novice::LoadTexture("./images/warp1.png");
+    int warpTexture2 = Novice::LoadTexture("./images/warp2.png");
+    int warpTexture3 = Novice::LoadTexture("./images/warp3.png");
+    int warpTexture4 = Novice::LoadTexture("./images/warp4.png");
 
-	char keys[256] = {};
-	char preKeys[256] = {};
+    // トラップ・鍵
+    int trapTexture = Novice::LoadTexture("./images/spikeTrap.png");
+    int keyTexture = Novice::LoadTexture("./images/key.png");
 
-	Player player = {};
-	InitializeTutorialPlayer(player);
+    // ハートUI
+    int heart1Texture = Novice::LoadTexture("./images/heart_UI_1.png");
+    int heart2Texture = Novice::LoadTexture("./images/heart_UI_2.png");
+    int heart3Texture = Novice::LoadTexture("./images/heart_UI_3.png");
+    int heart4Texture = Novice::LoadTexture("./images/heart_UI_4.png");
 
-	Camera camera = { 0.0f, 0.0f };
-	InitializeMap();
+    // シーン画像
+    int titleTexture = Novice::LoadTexture("./images/SCENE_Title.png");
+    int clearTexture = Novice::LoadTexture("./images/SCENE_Clear.png");
+    int gameOverTexture = Novice::LoadTexture("./images/SCENE_GameOver.png");
 
-	Scene scene = kSceneTitle;
+    // プレイヤー4方向
+    int playerFrontTexture = Novice::LoadTexture("./images/player2.png");
+    int playerBackTexture = Novice::LoadTexture("./images/player1.png");
+    int playerLeftTexture = Novice::LoadTexture("./images/player4.png");
+    int playerRightTexture = Novice::LoadTexture("./images/player3.png");
 
-	while (Novice::ProcessMessage() == 0)
-	{
-		Novice::BeginFrame();
+    // BGM
+    const int kTitleBGMHandle =
+        Novice::LoadAudio("./Sounds/MusMus-BGM-173.mp3");
 
-		memcpy(preKeys, keys, 256);
-		Novice::GetHitKeyStateAll(keys);
+    const int kPlayHandle =
+        Novice::LoadAudio("./Sounds/MusMus-BGM-155.mp3");
 
-		if (keys[DIK_F11] != 0 && preKeys[DIK_F11] == 0)
-		{
-			ToggleFullScreen(
-				gameWindow, windowRect, windowStyle, isFullScreen
-			);
-		}
+    const int kStage1Handle =
+        Novice::LoadAudio("./Sounds/MusMus-BGM-112.mp3");
 
-		switch (scene)
-		{
-		case kSceneTitle:
-			Novice::DrawSprite(
-				0, 0, titleTexture,
-				1.0f, 1.0f, 0.0f, WHITE
-			);
+    const int kClearHandle =
+        Novice::LoadAudio("./Sounds/MusMus-BGM-156.mp3");
 
-			if ((preKeys[DIK_RETURN] == 0 && keys[DIK_RETURN] != 0) ||
-				(preKeys[DIK_1] == 0 && keys[DIK_1] != 0))
-			{
-				InitializeMap();
-				InitializeTutorialPlayer(player);
-				camera = { 0.0f, 0.0f };
-				scene = kSceneTutorial;
-			}
+    const int kGameOverHandle =
+        Novice::LoadAudio("./Sounds/MusMus-BGM-110.mp3");
 
-			if (preKeys[DIK_2] == 0 && keys[DIK_2] != 0)
-			{
-				InitializeMap();
-				InitializeStage1Player(player);
-				camera = { 0.0f, 0.0f };
-				scene = kSceneStage1;
-			}
-			break;
+    // 効果音
+    const int kTrapHandle =
+        Novice::LoadAudio("./Sounds/剣で斬る.mp3");
 
-		case kSceneTutorial:
-			UpdateTutorialPlayer(player, keys, preKeys);
+    const int kWarpHandle =
+        Novice::LoadAudio("./Sounds/おばけの笑い声2.mp3");
 
-			if (player.hp <= 0)
-			{
-				scene = kSceneGameOver;
-				break;
-			}
+    const int kTruckHandle =
+        Novice::LoadAudio("./Sounds/足音1.mp3");
 
-			if (IsTutorialGoalReached(player))
-			{
-				scene = kSceneStage1;
-				break;
-			}
+    const int kKeyHandle =
+        Novice::LoadAudio("./Sounds/ジャジャーン2.mp3");
 
-			UpdateTutorialCamera(camera, player);
+    const int kGoalHandle =
+        Novice::LoadAudio("./Sounds/マリンバグリッサンド3.mp3");
 
-			DrawTutorialMap(
-				blockTexture,
-				upBlock,
-				rightBlock,
-				downBlock,
-				leftBlock,
-				warp1,
-				spikeTrap,
-				camera
-			);
+    char keys[256] = {};
+    char preKeys[256] = {};
 
-			DrawPlayer(player, camera, playerTexture);
-			DrawKeyArrow(player, camera, true);
-			DrawBackground(player, bar1Texture, bar2Texture);
+    Player player = {};
+    InitializeTutorialPlayer(player);
 
-			Novice::ScreenPrintf(
-				kGameX + 20, 50,
-				"HP: %d / %d", player.hp, kPlayerMaxHP
-			);
+    Camera camera = { 0.0f, 0.0f };
+    InitializeMap();
 
-			Novice::ScreenPrintf(
-				kGameX + 200, 50,
-				"Invincible: %d", player.invincibleTimer
-			);
+    Scene scene = kSceneTitle;
 
-			Novice::ScreenPrintf(
-				kGameX + 400, 50,
-				"KEY: %d / %d", player.keyCount, kRequiredKeyCount
-			);
+    // 足音の再生ハンドル
+    int footstepVoice = -1;
 
-			Novice::ScreenPrintf(
-				kGameX + 580, 50,
-				"H: KEY ARROW"
-			);
-			break;
+    // ゴール音の二重再生防止
+    bool goalSoundPlayed = false;
 
-		case kSceneStage1:
-			UpdateStage1Player(player, keys, preKeys);
+    while (Novice::ProcessMessage() == 0)
+    {
+        Novice::BeginFrame();
 
-			if (player.hp <= 0)
-			{
-				scene = kSceneGameOver;
-				break;
-			}
+        memcpy(preKeys, keys, 256);
+        Novice::GetHitKeyStateAll(keys);
 
-			if (IsStage1GoalReached(player))
-			{
-				scene = kSceneClear;
-				break;
-			}
+        // F11でフルスクリーン切り替え
+        if (keys[DIK_F11] != 0 && preKeys[DIK_F11] == 0)
+        {
+            ToggleFullScreen(
+                gameWindow,
+                windowRect,
+                windowStyle,
+                isFullScreen
+            );
+        }
 
-			UpdateStage1Camera(camera, player);
+        // シーンに応じてBGMを切り替える
+        UpdateBGM(
+            scene,
+            kTitleBGMHandle,
+            kPlayHandle,
+            kStage1Handle,
+            kClearHandle,
+            kGameOverHandle
+        );
 
-			DrawStage1Map(
-				blockTexture,
-				upBlock,
-				rightBlock,
-				downBlock,
-				leftBlock,
-				warp1,
-				spikeTrap,
-				camera
-			);
+        // プレイ画面以外では足音を停止
+        if (scene != kSceneTutorial && scene != kSceneStage1 &&
+            footstepVoice != -1)
+        {
+            if (Novice::IsPlayingAudio(footstepVoice))
+            {
+                Novice::StopAudio(footstepVoice);
+            }
 
-			DrawPlayer(player, camera, playerTexture);
-			DrawKeyArrow(player, camera, false);
-			DrawBackground(player, bar1Texture, bar2Texture);
+            footstepVoice = -1;
+        }
 
-			Novice::ScreenPrintf(
-				kGameX + 20, 50,
-				"HP: %d / %d", player.hp, kPlayerMaxHP
-			);
+        switch (scene)
+        {
+        case kSceneTitle:
+        {
+            Novice::DrawSprite(
+                0, 0, titleTexture,
+                1.0f, 1.0f, 0.0f, WHITE
+            );
 
-			Novice::ScreenPrintf(
-				kGameX + 200, 50,
-				"Invincible: %d", player.invincibleTimer
-			);
+            if ((preKeys[DIK_RETURN] == 0 && keys[DIK_RETURN] != 0) ||
+                (preKeys[DIK_1] == 0 && keys[DIK_1] != 0))
+            {
+                InitializeMap();
+                InitializeTutorialPlayer(player);
+                camera = { 0.0f, 0.0f };
+                goalSoundPlayed = false;
+                scene = kSceneTutorial;
+            }
 
-			Novice::ScreenPrintf(
-				kGameX + 400, 50,
-				"KEY: %d / %d", player.keyCount, kRequiredKeyCount
-			);
+            if (preKeys[DIK_2] == 0 && keys[DIK_2] != 0)
+            {
+                InitializeMap();
+                InitializeStage1Player(player);
+                camera = { 0.0f, 0.0f };
+                goalSoundPlayed = false;
+                scene = kSceneStage1;
+            }
 
-			Novice::ScreenPrintf(
-				kGameX + 580, 50,
-				"H: KEY ARROW"
-			);
-			break;
+            break;
+        }
 
-		case kSceneClear:
-			Novice::DrawSprite(
-				0, 0, clearTexture,
-				1.0f, 1.0f, 0.0f, WHITE
-			);
+        case kSceneTutorial:
+        {
+            // 移動前の状態を保存
+            float oldX = player.x;
+            float oldY = player.y;
+            int oldHP = player.hp;
+            int oldKeyCount = player.keyCount;
 
-			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
-			{
-				scene = kSceneTitle;
-			}
-			break;
+            UpdateTutorialPlayer(player, keys, preKeys);
 
-		case kSceneGameOver:
-			Novice::DrawSprite(
-				0, 0, gameOverTexture,
-				1.0f, 1.0f, 0.0f, WHITE
-			);
+            // ダメージ音は一度だけ再生
+            if (player.hp < oldHP)
+            {
+                Novice::PlayAudio(kTrapHandle, false, 0.7f);
+            }
 
-			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
-			{
-				scene = kSceneTitle;
-			}
-			break;
-		}
+            // 鍵取得音は一度だけ再生
+            if (player.keyCount > oldKeyCount)
+            {
+                Novice::PlayAudio(kKeyHandle, false, 0.7f);
+            }
 
-		Novice::ScreenPrintf(
-			10, 10, "full screen : %d",
-			isFullScreen ? 1 : 0
-		);
+            // ワープ判定
+            float dx = player.x - oldX;
+            float dy = player.y - oldY;
 
-		Novice::ScreenPrintf(
-			10, 30, "window handle : %d",
-			gameWindow != nullptr ? 1 : 0
-		);
+            bool didWarp =
+                (dx * dx + dy * dy > 80.0f * 80.0f);
 
-		Novice::EndFrame();
+            if (didWarp)
+            {
+                // ワープ音は一度だけ再生
+                Novice::PlayAudio(kWarpHandle, false, 0.7f);
 
-		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0)
-		{
-			break;
-		}
-	}
+                // ワープ時は足音を停止
+                if (footstepVoice != -1)
+                {
+                    if (Novice::IsPlayingAudio(footstepVoice))
+                    {
+                        Novice::StopAudio(footstepVoice);
+                    }
 
-	Novice::Finalize();
-	return 0;
+                    footstepVoice = -1;
+                }
+            }
+            else if (player.isMoving)
+            {
+                // 足音は移動中ずっとループ再生
+                if (footstepVoice == -1 ||
+                    !Novice::IsPlayingAudio(footstepVoice))
+                {
+                    footstepVoice =
+                        Novice::PlayAudio(kTruckHandle, true, 0.4f);
+                }
+            }
+            else if (footstepVoice != -1)
+            {
+                // 移動が終わったら足音を停止
+                if (Novice::IsPlayingAudio(footstepVoice))
+                {
+                    Novice::StopAudio(footstepVoice);
+                }
+
+                footstepVoice = -1;
+            }
+
+            if (player.hp <= 0)
+            {
+                scene = kSceneGameOver;
+                break;
+            }
+
+            if (IsTutorialGoalReached(player))
+            {
+                if (!goalSoundPlayed)
+                {
+                    // ゴール音は一度だけ再生
+                    Novice::PlayAudio(kGoalHandle, false, 0.7f);
+                    goalSoundPlayed = true;
+                }
+
+                // チュートリアルのゴール後はステージ1へ
+                scene = kSceneStage1;
+                InitializeStage1Player(player);
+                camera = { 0.0f, 0.0f };
+                goalSoundPlayed = false;
+                break;
+            }
+
+            UpdateTutorialCamera(camera, player);
+
+            DrawTutorialMap(
+                blockTexture,
+                upBlock,
+                rightBlock,
+                downBlock,
+                leftBlock,
+                warpTexture1,
+                warpTexture2,
+                warpTexture3,
+                warpTexture4,
+                trapTexture,
+                keyTexture,
+                camera
+            );
+
+            DrawPlayer(
+                player,
+                camera,
+                playerFrontTexture,
+                playerBackTexture,
+                playerLeftTexture,
+                playerRightTexture
+            );
+
+            DrawKeyArrow(player, camera, true);
+
+            DrawBackground(
+                player,
+                bar1Texture,
+                bar2Texture,
+                heart1Texture,
+                heart2Texture,
+                heart3Texture,
+                heart4Texture
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 20, 50,
+                "HP: %d / %d", player.hp, kPlayerMaxHP
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 200, 50,
+                "Invincible: %d", player.invincibleTimer
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 400, 50,
+                "KEY: %d / %d", player.keyCount, kRequiredKeyCount
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 580, 50,
+                "H: KEY ARROW"
+            );
+
+            break;
+        }
+
+        case kSceneStage1:
+        {
+            float oldX = player.x;
+            float oldY = player.y;
+            int oldHP = player.hp;
+            int oldKeyCount = player.keyCount;
+
+            UpdateStage1Player(player, keys, preKeys);
+
+            // ダメージ音は一度だけ再生
+            if (player.hp < oldHP)
+            {
+                Novice::PlayAudio(kTrapHandle, false, 0.7f);
+            }
+
+            // 鍵取得音は一度だけ再生
+            if (player.keyCount > oldKeyCount)
+            {
+                Novice::PlayAudio(kKeyHandle, false, 0.7f);
+            }
+
+            // ワープ判定
+            float dx = player.x - oldX;
+            float dy = player.y - oldY;
+
+            bool didWarp =
+                (dx * dx + dy * dy > 80.0f * 80.0f);
+
+            if (didWarp)
+            {
+                // ワープ音は一度だけ再生
+                Novice::PlayAudio(kWarpHandle, false, 0.7f);
+
+                // ワープ時は足音を停止
+                if (footstepVoice != -1)
+                {
+                    if (Novice::IsPlayingAudio(footstepVoice))
+                    {
+                        Novice::StopAudio(footstepVoice);
+                    }
+
+                    footstepVoice = -1;
+                }
+            }
+            else if (player.isMoving)
+            {
+                // 足音は移動中ずっとループ再生
+                if (footstepVoice == -1 ||
+                    !Novice::IsPlayingAudio(footstepVoice))
+                {
+                    footstepVoice =
+                        Novice::PlayAudio(kTruckHandle, true, 0.4f);
+                }
+            }
+            else if (footstepVoice != -1)
+            {
+                // 移動が終わったら足音を停止
+                if (Novice::IsPlayingAudio(footstepVoice))
+                {
+                    Novice::StopAudio(footstepVoice);
+                }
+
+                footstepVoice = -1;
+            }
+
+            if (player.hp <= 0)
+            {
+                scene = kSceneGameOver;
+                break;
+            }
+
+            if (IsStage1GoalReached(player))
+            {
+                if (!goalSoundPlayed)
+                {
+                    // ゴール音は一度だけ再生
+                    Novice::PlayAudio(kGoalHandle, false, 0.7f);
+                    goalSoundPlayed = true;
+                }
+
+                scene = kSceneClear;
+                break;
+            }
+
+            UpdateStage1Camera(camera, player);
+
+            DrawStage1Map(
+                blockTexture,
+                upBlock,
+                rightBlock,
+                downBlock,
+                leftBlock,
+                warpTexture1,
+                warpTexture2,
+                warpTexture3,
+                warpTexture4,
+                trapTexture,
+                keyTexture,
+                camera
+            );
+
+            DrawPlayer(
+                player,
+                camera,
+                playerFrontTexture,
+                playerBackTexture,
+                playerLeftTexture,
+                playerRightTexture
+            );
+
+            DrawKeyArrow(player, camera, false);
+
+            DrawBackground(
+                player,
+                bar1Texture,
+                bar2Texture,
+                heart1Texture,
+                heart2Texture,
+                heart3Texture,
+                heart4Texture
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 20, 50,
+                "HP: %d / %d", player.hp, kPlayerMaxHP
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 200, 50,
+                "Invincible: %d", player.invincibleTimer
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 400, 50,
+                "KEY: %d / %d", player.keyCount, kRequiredKeyCount
+            );
+
+            Novice::ScreenPrintf(
+                kGameX + 580, 50,
+                "H: KEY ARROW"
+            );
+
+            break;
+        }
+
+        case kSceneClear:
+        {
+            Novice::DrawSprite(
+                0, 0, clearTexture,
+                1.0f, 1.0f, 0.0f, WHITE
+            );
+
+            if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
+            {
+                scene = kSceneTitle;
+            }
+
+            break;
+        }
+
+        case kSceneGameOver:
+        {
+            Novice::DrawSprite(
+                0, 0, gameOverTexture,
+                1.0f, 1.0f, 0.0f, WHITE
+            );
+
+            if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
+            {
+                scene = kSceneTitle;
+            }
+
+            break;
+        }
+        }
+
+        Novice::ScreenPrintf(
+            10, 10, "full screen : %d",
+            isFullScreen ? 1 : 0
+        );
+
+        Novice::ScreenPrintf(
+            10, 30, "window handle : %d",
+            gameWindow != nullptr ? 1 : 0
+        );
+
+        Novice::EndFrame();
+
+        if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0)
+        {
+            break;
+        }
+    }
+
+    // 終了時に足音を停止
+    if (footstepVoice != -1 &&
+        Novice::IsPlayingAudio(footstepVoice))
+    {
+        Novice::StopAudio(footstepVoice);
+    }
+
+    // 終了時にBGMを停止
+    if (currentBgmVoice != -1 &&
+        Novice::IsPlayingAudio(currentBgmVoice))
+    {
+        Novice::StopAudio(currentBgmVoice);
+    }
+
+    Novice::Finalize();
+    return 0;
 }
