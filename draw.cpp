@@ -1,4 +1,3 @@
-
 #include "game.h"
 
 // 描画処理
@@ -11,36 +10,30 @@ void UpdateTutorialCamera(
     const Player& player
 )
 {
-    // プレイヤーを画面中央に配置
     camera.x = player.x - kGameWidth / 2.0f;
     camera.y = player.y - kGameHeight / 2.0f;
 
-    // 左端
     if (camera.x < 0.0f)
     {
         camera.x = 0.0f;
     }
 
-    // 上端
     if (camera.y < 0.0f)
     {
         camera.y = 0.0f;
     }
 
-    // カメラが移動できる最大位置
     float maxCameraX =
         kMaxTutorialWidth * kMapSize - kGameWidth;
 
     float maxCameraY =
         kMaxTutorialHeight * kMapSize - kGameHeight;
 
-    // 右端
     if (camera.x > maxCameraX)
     {
         camera.x = maxCameraX;
     }
 
-    // 下端
     if (camera.y > maxCameraY)
     {
         camera.y = maxCameraY;
@@ -69,7 +62,6 @@ void DrawTutorialMap(
                 kGameY + y * kMapSize
                 - static_cast<int>(camera.y);
 
-            // 画面外のマップチップは描画しない
             if (
                 posX + kMapSize <= kGameX ||
                 posX >= kGameX + kGameWidth ||
@@ -85,27 +77,22 @@ void DrawTutorialMap(
             switch (mapData1[y][x])
             {
             case 1:
-                // 壁
                 texture = blockTexture;
                 break;
 
             case kBlockUp:
-                // 上方向の一方通行
                 texture = upBlock;
                 break;
 
             case kBlockRight:
-                // 右方向の一方通行
                 texture = rightBlock;
                 break;
 
             case kBlockDown:
-                // 下方向の一方通行
                 texture = downBlock;
                 break;
 
             case kBlockLeft:
-                // 左方向の一方通行
                 texture = leftBlock;
                 break;
 
@@ -122,12 +109,24 @@ void DrawTutorialMap(
                 );
                 break;
 
+            case kBlockSpike:
+                // とげブロック
+                Novice::DrawTriangle(
+                    posX,
+                    posY + kMapSize,
+                    posX + kMapSize / 2,
+                    posY,
+                    posX + kMapSize,
+                    posY + kMapSize,
+                    0xFF3333FF,
+                    kFillModeSolid
+                );
+                break;
+
             default:
-                // 床など、何も描画しないマス
                 break;
             }
 
-            // テクスチャがある場合は描画
             if (texture != 0)
             {
                 Novice::DrawSprite(
@@ -154,36 +153,30 @@ void UpdateStage1Camera(
     const Player& player
 )
 {
-    // プレイヤーを画面中央に配置
     camera.x = player.x - kGameWidth / 2.0f;
     camera.y = player.y - kGameHeight / 2.0f;
 
-    // 左端
     if (camera.x < 0.0f)
     {
         camera.x = 0.0f;
     }
 
-    // 上端
     if (camera.y < 0.0f)
     {
         camera.y = 0.0f;
     }
 
-    // カメラが移動できる最大位置
     float maxCameraX =
         kMaxStage1Width * kMapSize - kGameWidth;
 
     float maxCameraY =
         kMaxStage1Height * kMapSize - kGameHeight;
 
-    // 右端
     if (camera.x > maxCameraX)
     {
         camera.x = maxCameraX;
     }
 
-    // 下端
     if (camera.y > maxCameraY)
     {
         camera.y = maxCameraY;
@@ -212,7 +205,6 @@ void DrawStage1Map(
                 kGameY + y * kMapSize
                 - static_cast<int>(camera.y);
 
-            // 画面外のマップチップは描画しない
             if (
                 posX + kMapSize <= kGameX ||
                 posX >= kGameX + kGameWidth ||
@@ -228,27 +220,22 @@ void DrawStage1Map(
             switch (mapData2[y][x])
             {
             case 1:
-                // 壁
                 texture = blockTexture;
                 break;
 
             case kBlockUp:
-                // 上方向の一方通行
                 texture = upBlock;
                 break;
 
             case kBlockRight:
-                // 右方向の一方通行
                 texture = rightBlock;
                 break;
 
             case kBlockDown:
-                // 下方向の一方通行
                 texture = downBlock;
                 break;
 
             case kBlockLeft:
-                // 左方向の一方通行
                 texture = leftBlock;
                 break;
 
@@ -265,12 +252,24 @@ void DrawStage1Map(
                 );
                 break;
 
+            case kBlockSpike:
+                // とげブロック
+                Novice::DrawTriangle(
+                    posX,
+                    posY + kMapSize,
+                    posX + kMapSize / 2,
+                    posY,
+                    posX + kMapSize,
+                    posY + kMapSize,
+                    0xFF3333FF,
+                    kFillModeSolid
+                );
+                break;
+
             default:
-                // 床など、何も描画しないマス
                 break;
             }
 
-            // テクスチャがある場合は描画
             if (texture != 0)
             {
                 Novice::DrawSprite(
@@ -387,6 +386,13 @@ void DrawPlayer(
             camera.y -
             kMapSize / 2.0f
             );
+
+    // 無敵中は点滅させる
+    if (player.invincibleTimer > 0 &&
+        (player.invincibleTimer / 5) % 2 == 0)
+    {
+        return;
+    }
 
     Novice::DrawSprite(
         drawX,

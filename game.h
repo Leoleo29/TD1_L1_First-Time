@@ -1,4 +1,3 @@
-
 #pragma once
 #include <Novice.h>
 
@@ -40,9 +39,13 @@ const int kBlockRight = 3;
 const int kBlockDown = 4;
 const int kBlockLeft = 5;
 const int kBlockWarp = 6;
+const int kBlockSpike = 7;
 
-// ワープ地点の最大数
-const int kMaxWarpCount = 200;
+// HP設定
+const int kPlayerMaxHP = 3;
+
+// 無敵時間（60フレーム）
+const int kInvincibleTime = 60;
 
 // プレイヤー
 struct Player
@@ -58,6 +61,12 @@ struct Player
     bool warpLocked;
     int warpMapX;
     int warpMapY;
+
+    // HP管理
+    int hp;
+
+    // ダメージを受けた後の無敵時間
+    int invincibleTimer;
 };
 
 // カメラ
@@ -78,14 +87,6 @@ void InitializeStage1Player(Player& player);
 // プレイヤー更新
 void UpdateTutorialPlayer(Player& player, char* keys, char* preKeys);
 void UpdateStage1Player(Player& player, char* keys, char* preKeys);
-
-// ワープ処理
-void UpdateWarp(
-    Player& player,
-    const int map[][kMaxTutorialHeight],
-    int width,
-    int height
-);
 
 void InitializeMap();
 

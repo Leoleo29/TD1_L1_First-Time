@@ -1,17 +1,17 @@
 #include <Novice.h>
 #include <Windows.h>
 #include <cstring>
-#include "game.h"    // ゲームの宣言をまとめたヘッダファイル
+#include "game.h"
 #include "fullScreen.h"
 
 const char kWindowTitle[] =
 "台パンするキンタロウ・ホズミ  ゼン";
 
 int WINAPI WinMain(
-	_In_ HINSTANCE,
-	_In_opt_ HINSTANCE,
-	_In_ LPSTR,
-	_In_ int
+    _In_ HINSTANCE,
+    _In_opt_ HINSTANCE,
+    _In_ LPSTR,
+    _In_ int
 )
 {
 	// ウィンドウの初期化
@@ -20,14 +20,10 @@ int WINAPI WinMain(
 	// Noviceのウィンドウハンドルを取得
 	HWND gameWindow = GetActiveWindow();
 
-	// ウィンドウの位置・サイズを保存する変数
-	RECT windowRect = {};
-
-	// ウィンドウのスタイルを保存
-	LONG_PTR windowStyle = 0;
-
-	// フルスクリーン状態
-	bool isFullScreen = false;
+    // フルスクリーン切り替え用
+    RECT windowRect = {};
+    LONG_PTR windowStyle = 0;
+    bool isFullScreen = false;
 
 	if (gameWindow == nullptr)
 	{
@@ -139,234 +135,300 @@ int WINAPI WinMain(
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	Player player;
-	InitializeTutorialPlayer(player);
+    // プレイヤー初期化
+    Player player;
+    InitializeTutorialPlayer(player);
 
-	Camera camera = { 0.0f, 0.0f };
+    // カメラ初期化
+    Camera camera = { 0.0f, 0.0f };
 
-	InitializeMap();
+    // マップ初期化
+    InitializeMap();
 
-	Scene scene = kSceneTitle;
+    // 最初はタイトル画面
+    Scene scene = kSceneTitle;
 
-	while (Novice::ProcessMessage() == 0)
-	{
-		Novice::BeginFrame();
+    while (Novice::ProcessMessage() == 0)
+    {
+        Novice::BeginFrame();
 
-		memcpy(preKeys, keys, 256);
-		Novice::GetHitKeyStateAll(keys);
+        memcpy(preKeys, keys, 256);
+        Novice::GetHitKeyStateAll(keys);
 
-		// F11キーが押された瞬間に処理する
-		if (
-			keys[DIK_F11] != 0 &&
-			preKeys[DIK_F11] == 0
-			)
-		{
-			// F11が押されたか確認する
-			OutputDebugStringA("F11 pressed\n");
+        // F11キーでフルスクリーン切り替え
+        if (
+            keys[DIK_F11] != 0 &&
+            preKeys[DIK_F11] == 0
+            )
+        {
+            OutputDebugStringA("F11 pressed\n");
 
-			// フルスクリーンとウィンドウ表示を切り替える
-			ToggleFullScreen(
-				gameWindow,
-				windowRect,
-				windowStyle,
-				isFullScreen
-			);
-		}
+            ToggleFullScreen(
+                gameWindow,
+                windowRect,
+                windowStyle,
+                isFullScreen
+            );
+        }
 
-		switch (scene)
-		{
-		case kSceneTitle:
+        switch (scene)
+        {
+        case kSceneTitle:
 
-			// タイトル画面の更新・描画
-			Novice::DrawSprite(
-				0,
-				0,
-				SCENE_TitleTexture,
-				1.0f,
-				1.0f,
-				0.0f,
-				WHITE
-			);
-			// 〇〇が押されたらゲームスタート
-			if (preKeys[DIK_RETURN] == 0 && keys[DIK_RETURN] != 0)
-			{
-				scene = kSceneTutorial;
-			}
+            // タイトル画面
+            Novice::DrawSprite(
+                0,
+                0,
+                SCENE_TitleTexture,
+                1.0f,
+                1.0f,
+                0.0f,
+                WHITE
+            );
 
-			// debug用 チュートリアル
-			if (preKeys[DIK_1] == 0 && keys[DIK_1] != 0)
-			{
-				InitializeTutorialPlayer(player);
-				camera = { 0.0f, 0.0f };
-				scene = kSceneTutorial;
-			}
+            // Enterキーでチュートリアル開始
+            if (
+                preKeys[DIK_RETURN] == 0 &&
+                keys[DIK_RETURN] != 0
+                )
+            {
+                InitializeTutorialPlayer(player);
+                camera = { 0.0f, 0.0f };
+                scene = kSceneTutorial;
+            }
 
-			// debug用 ステージ1
-			if (preKeys[DIK_2] == 0 && keys[DIK_2] != 0)
-			{
-				InitializeStage1Player(player);
-				camera = { 0.0f, 0.0f };
-				scene = kSceneStage1;
-			}
+            // デバッグ用：1キーでチュートリアル開始
+            if (
+                preKeys[DIK_1] == 0 &&
+                keys[DIK_1] != 0
+                )
+            {
+                InitializeTutorialPlayer(player);
+                camera = { 0.0f, 0.0f };
+                scene = kSceneTutorial;
+            }
 
-			break;
+            // デバッグ用：2キーでステージ1開始
+            if (
+                preKeys[DIK_2] == 0 &&
+                keys[DIK_2] != 0
+                )
+            {
+                InitializeStage1Player(player);
+                camera = { 0.0f, 0.0f };
+                scene = kSceneStage1;
+            }
 
-		case kSceneTutorial:
+            break;
 
-			// プレイヤー更新
-			UpdateTutorialPlayer(
-				player,
-				keys,
-				preKeys
-			);
+        case kSceneTutorial:
 
-			// カメラ更新
-			UpdateTutorialCamera(
-				camera,
-				player
-			);
+            // プレイヤー更新
+            UpdateTutorialPlayer(
+                player,
+                keys,
+                preKeys
+            );
 
-			// マップ描画
-			DrawTutorialMap(
-				blockTexture,
-				upBlock,
-				rightBlock,
-				downBlock,
-				leftBlock,
-				camera
-			);
+            // HPが0ならゲームオーバー
+            if (player.hp <= 0)
+            {
+                scene = kSceneGameOver;
+                break;
+            }
 
-			// プレイヤー描画
-			DrawPlayer(
-				player,
-				camera,
-				playerTexture
-			);
+            // カメラ更新
+            UpdateTutorialCamera(
+                camera,
+                player
+            );
 
-			// 背景描画
-			DrawBackground(
-				player,
-				bar1Texture,
-				bar2Texture
-			);
+            // マップ描画
+            DrawTutorialMap(
+                blockTexture,
+                upBlock,
+                rightBlock,
+                downBlock,
+                leftBlock,
+                camera
+            );
 
-			break;
+            // プレイヤー描画
+            DrawPlayer(
+                player,
+                camera,
+                playerTexture
+            );
 
-		case kSceneStage1:
+            // 背景描画
+            DrawBackground(
+                player,
+                bar1Texture,
+                bar2Texture
+            );
 
-			// プレイヤー更新
-			UpdateStage1Player(
-				player,
-				keys,
-				preKeys
-			);
+            // HP表示
+            Novice::ScreenPrintf(
+                kGameX + 20,
+                50,
+                "HP: %d / %d",
+                player.hp,
+                kPlayerMaxHP
+            );
 
-			// カメラ更新
-			UpdateStage1Camera(
-				camera,
-				player
-			);
+            // 無敵時間のデバッグ表示
+            // 必要なければ、この部分は削除してOK
+            Novice::ScreenPrintf(
+                kGameX + 200,
+                50,
+                "Invincible: %d",
+                player.invincibleTimer
+            );
 
-			// マップ描画
-			DrawStage1Map(
-				blockTexture,
-				upBlock,
-				rightBlock,
-				downBlock,
-				leftBlock,
-				camera
-			);
+            break;
 
-			// プレイヤー描画
-			DrawPlayer(
-				player,
-				camera,
-				playerTexture
-			);
+        case kSceneStage1:
 
-			// 背景描画
-			DrawBackground(
-				player,
-				bar1Texture,
-				bar2Texture
-			);
+            // プレイヤー更新
+            UpdateStage1Player(
+                player,
+                keys,
+                preKeys
+            );
 
-			break;
+            // HPが0ならゲームオーバー
+            if (player.hp <= 0)
+            {
+                scene = kSceneGameOver;
+                break;
+            }
 
-		case kSceneClear:
+            // カメラ更新
+            UpdateStage1Camera(
+                camera,
+                player
+            );
 
-			// クリア画面
-			Novice::DrawSprite(
-				0,
-				0,
-				SCENE_ClearTexture,
-				1.0f,
-				1.0f,
-				0.0f,
-				WHITE
-			);
+            // マップ描画
+            DrawStage1Map(
+                blockTexture,
+                upBlock,
+                rightBlock,
+                downBlock,
+                leftBlock,
+                camera
+            );
 
-			// 〇〇が押されたらゲームスタート
-			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
-			{
-				scene = kSceneTitle;
-			}
+            // プレイヤー描画
+            DrawPlayer(
+                player,
+                camera,
+                playerTexture
+            );
 
-			break;
+            // 背景描画
+            DrawBackground(
+                player,
+                bar1Texture,
+                bar2Texture
+            );
 
-		case kSceneGameOver:
+            // HP表示
+            Novice::ScreenPrintf(
+                kGameX + 20,
+                50,
+                "HP: %d / %d",
+                player.hp,
+                kPlayerMaxHP
+            );
 
-			// ゲームオーバー画面
-			Novice::DrawSprite(
-				0,
-				0,
-				SCENE_GameOverTexture,
-				1.0f,
-				1.0f,
-				0.0f,
-				WHITE
-			);
+            // 無敵時間のデバッグ表示
+            Novice::ScreenPrintf(
+                kGameX + 200,
+                50,
+                "Invincible: %d",
+                player.invincibleTimer
+            );
 
-			// 〇〇が押されたらゲームスタート
-			if (preKeys[DIK_SPACE] == 0 && keys[DIK_SPACE] != 0)
-			{
-				scene = kSceneTitle;
-			}
+            break;
 
-			break;
+        case kSceneClear:
 
-		}
+            // クリア画面
+            Novice::DrawSprite(
+                0,
+                0,
+                SCENE_ClearTexture,
+                1.0f,
+                1.0f,
+                0.0f,
+                WHITE
+            );
 
-		Novice::ScreenPrintf(
-			10, 10,
-			"full screen : %d",
-			isFullScreen ? 1 : 0
-		);
+            // Spaceキーでタイトルへ戻る
+            if (
+                preKeys[DIK_SPACE] == 0 &&
+                keys[DIK_SPACE] != 0
+                )
+            {
+                scene = kSceneTitle;
+            }
 
-		Novice::ScreenPrintf(
-			10, 30,
-			"window handle : %d",
-			gameWindow != nullptr ? 1 : 0
-		);
+            break;
 
-		/*Novice::ScreenPrintf(
-			10, 40,
-			"scene : %c",
-			Scene
-		);*/
+        case kSceneGameOver:
 
-		Novice::EndFrame();
+            // ゲームオーバー画面
+            Novice::DrawSprite(
+                0,
+                0,
+                SCENE_GameOverTexture,
+                1.0f,
+                1.0f,
+                0.0f,
+                WHITE
+            );
 
-		if (
-			preKeys[DIK_ESCAPE] == 0 &&
-			keys[DIK_ESCAPE] != 0
-			)
-		{
-			break;
-		}
-	}
+            // Spaceキーでタイトルへ戻る
+            if (
+                preKeys[DIK_SPACE] == 0 &&
+                keys[DIK_SPACE] != 0
+                )
+            {
+                scene = kSceneTitle;
+            }
 
-	Novice::Finalize();
+            break;
+        }
 
-	return 0;
+        // フルスクリーン状態の表示
+        Novice::ScreenPrintf(
+            10,
+            10,
+            "full screen : %d",
+            isFullScreen ? 1 : 0
+        );
+
+        Novice::ScreenPrintf(
+            10,
+            30,
+            "window handle : %d",
+            gameWindow != nullptr ? 1 : 0
+        );
+
+        Novice::EndFrame();
+
+        // ESCキーで終了
+        if (
+            preKeys[DIK_ESCAPE] == 0 &&
+            keys[DIK_ESCAPE] != 0
+            )
+        {
+            break;
+        }
+    }
+
+    Novice::Finalize();
+
+    return 0;
 }
